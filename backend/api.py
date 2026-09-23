@@ -4,7 +4,7 @@ import sys
 from pathlib import Path
 from typing import Any
 
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 
 # Support both `python backend/api.py` and `uvicorn backend.api:app`.
@@ -12,11 +12,13 @@ if __package__ in {None, ""}:
     sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from backend.dataset_repository import load_all_datasets
-from backend.schemas import ScenarioRequest
+from backend.scenario_repository import DATABASE_PATH, list_scenarios, save_scenario
+from backend.schemas import SaveScenarioRequest, ScenarioRequest
 from backend.scoring import calculate_baseline, calculate_scenario, validate_decisions
 
 
 app = FastAPI(title="Akim for 5 Hours API", version="1.0.0")
+SCENARIO_DB_PATH = DATABASE_PATH
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -81,6 +83,20 @@ def validate_scenario(request: ScenarioRequest) -> dict[str, Any]:
 @app.post("/api/v1/scenarios/calculate")
 def calculate(request: ScenarioRequest) -> dict[str, Any]:
     return calculate_scenario(_decision_dicts(request))
+
+
+@app.post("/api/v1/scenarios", status_code=201)
+def create_scenario(request: SaveScenarioRequest) -> dict[str, Any]:
+    decisions = _decision_dicts(request)
+    result = calculate_scenario(decisions)
+    if not result["valid"]:
+        raise HTTPException(status_code=400, detail=result["validationErrors"])
+    return save_scenario(request.name, decisions, result, SCENARIO_DB_PATH)
+
+
+@app.get("/api/v1/scenarios")
+def get_scenarios() -> list[dict[str, Any]]:
+    return list_scenarios(SCENARIO_DB_PATH)
 
 
 # Temporary compatibility routes for the first local prototype.
