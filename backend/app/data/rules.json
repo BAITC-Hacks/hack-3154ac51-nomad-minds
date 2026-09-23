@@ -1,0 +1,42 @@
+{
+  "datasetVersion": "1.0.0",
+  "budget": 100,
+  "requiredDecisionCount": 5,
+  "maxMeasuresPerDirection": 2,
+  "simulationHorizonQuarters": 8,
+  "indicatorMinimum": 0,
+  "indicatorMaximum": 100,
+  "incompatibleMeasures": [
+    ["M1", "M3"]
+  ],
+  "incompatibleMeasureDistrictPairs": [
+    ["M4", "M7"],
+    ["M5", "M13"]
+  ],
+  "synergies": [
+    {
+      "measures": ["M1", "M2"],
+      "indicator": "T1",
+      "bonus": 2,
+      "scope": "district_of_first_measure"
+    },
+    {
+      "measures": ["M10", "M12"],
+      "indicator": "B1",
+      "bonus": 2,
+      "scope": "district_of_first_measure"
+    },
+    {
+      "measures": ["M5", "M6"],
+      "indicator": "E2",
+      "bonus": 2,
+      "scope": "district_of_first_measure"
+    }
+  ],
+  "scoreWeights": {
+    "weightedAverage": 0.7,
+    "weakestDistrict": 0.3,
+    "criticalPenalty": 1.0,
+    "criticalThreshold": 40
+  }
+}
