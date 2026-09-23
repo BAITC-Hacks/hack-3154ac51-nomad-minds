@@ -39,25 +39,43 @@
 .recommendations { background: #fff8ea; border-color: #f3dfb8; }
 .recommendations h3 { color: #d88b0b; }
 
-.ai-note {
+.radar-section {
   margin: 0 12px 12px;
-  min-height: 62px;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 9px 11px;
-  color: #236853;
-  background: linear-gradient(90deg, #e5f9f2, #f5fcfa);
-  border-radius: 7px;
+  padding-top: 8px;
+  border-top: 1px solid #e2ecf5;
 }
 
-.ai-note > nz-icon { font-size: 22px; }
-.ai-note strong,
-.ai-note span { display: block; }
-.ai-note strong { font-size: 10px; }
-.ai-note span { margin-top: 2px; color: #578070; font-size: 8px; }
+.radar-heading { display: flex; align-items: center; gap: 9px; }
+.radar-heading h3 { margin: 0 auto 0 0; color: #17345f; font-size: 11px; }
+.radar-heading h3 nz-icon { color: #1677ff; }
+.radar-heading span { color: #617995; font-size: 7px; }
+.radar-heading i { display: inline-block; width: 8px; height: 6px; margin-right: 3px; }
+.before-key { background: #cdd9e7; }
+.after-key { background: #3990f7; }
+
+.radar-wrap { height: 105px; display: flex; align-items: center; gap: 4px; }
+.radar-wrap svg { flex: 1; height: 100%; overflow: visible; }
+.radar-grid { fill: #f4f7fb; stroke: #cbd9e7; stroke-width: 0.8; }
+.radar-grid.outer { fill: transparent; }
+svg line { stroke: #d5e0eb; stroke-width: 0.7; }
+.radar-before { fill: rgba(163, 180, 201, 0.22); stroke: #9fafc2; stroke-width: 1.1; }
+.radar-after { fill: rgba(38, 119, 238, 0.2); stroke: #1677ff; stroke-width: 1.5; }
+svg text { fill: #385a80; font-size: 6px; }
+
+.balanced-note {
+  width: 112px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px;
+  color: #378773;
+  background: #e8faf4;
+  border-radius: 7px;
+  font-size: 7px;
+  line-height: 1.35;
+}
+.balanced-note nz-icon { color: #0dad81; font-size: 18px; }
 
 @media (max-width: 540px) {
   .analysis-grid { grid-template-columns: 1fr; }
 }
-

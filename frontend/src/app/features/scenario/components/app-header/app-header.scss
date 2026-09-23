@@ -3,7 +3,7 @@
 }
 
 .app-header {
-  min-height: 68px;
+  min-height: 60px;
   padding: 0 24px;
   display: grid;
   grid-template-columns: minmax(270px, 1fr) auto minmax(320px, 1fr);
@@ -128,4 +128,3 @@ nav a.active {
   .user span,
   .user nz-icon { display: none; }
 }
-

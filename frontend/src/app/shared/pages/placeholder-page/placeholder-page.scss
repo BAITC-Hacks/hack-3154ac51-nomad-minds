@@ -1,0 +1,54 @@
+.placeholder-page {
+  min-height: calc(100vh - 60px);
+  display: grid;
+  place-items: center;
+  padding: 24px;
+}
+
+.placeholder-page section {
+  width: min(540px, 100%);
+  padding: 48px;
+  text-align: center;
+  background: #fff;
+  border: 1px solid #dbe8f4;
+  border-radius: 14px;
+  box-shadow: 0 12px 32px rgba(25, 73, 125, 0.08);
+}
+
+.placeholder-icon {
+  width: 62px;
+  height: 62px;
+  display: grid;
+  place-items: center;
+  margin: 0 auto 18px;
+  color: #1677ff;
+  background: #e9f3ff;
+  border-radius: 50%;
+  font-size: 28px;
+}
+
+h1 {
+  margin: 0 0 10px;
+  color: #102b5c;
+  font-size: 27px;
+}
+
+p {
+  margin: 0 0 18px;
+  color: #607895;
+  line-height: 1.6;
+}
+
+.status-line {
+  margin: 0 0 22px;
+  padding: 10px 12px;
+  color: #41705f;
+  background: #edf9f4;
+  border-radius: 7px;
+  font-size: 11px;
+}
+
+.status-line nz-icon {
+  margin-right: 5px;
+  color: #12a66b;
+}

@@ -41,12 +41,33 @@
     </article>
   </div>
 
-  <div class="ai-note">
-    <nz-icon nzType="safety-certificate" />
-    <div>
-      <strong>Демо-режим без API</strong>
-      <span>Все числа рассчитаны локально. AI-текст пока берётся из мокового адаптера.</span>
+  <div class="radar-section">
+    <div class="radar-heading">
+      <h3><nz-icon nzType="bar-chart" /> Эффект по направлениям</h3>
+      <span><i class="before-key"></i>Базовый уровень</span>
+      <span><i class="after-key"></i>Ваш сценарий</span>
+    </div>
+    <div class="radar-wrap">
+      <svg viewBox="0 0 160 124" role="img" aria-label="Сравнение показателей по пяти направлениям">
+        <polygon points="80,17 122.8,48.1 106.5,98.4 53.5,98.4 37.2,48.1" class="radar-grid outer" />
+        <polygon points="80,32 108.5,52.7 97.6,86.2 62.4,86.2 51.5,52.7" class="radar-grid" />
+        <line x1="80" y1="62" x2="80" y2="17" />
+        <line x1="80" y1="62" x2="122.8" y2="48.1" />
+        <line x1="80" y1="62" x2="106.5" y2="98.4" />
+        <line x1="80" y1="62" x2="53.5" y2="98.4" />
+        <line x1="80" y1="62" x2="37.2" y2="48.1" />
+        <polygon [attr.points]="radarPoints('before')" class="radar-before" />
+        <polygon [attr.points]="radarPoints('after')" class="radar-after" />
+        <text x="80" y="9" text-anchor="middle">Транспорт</text>
+        <text x="127" y="44">Озеленение</text>
+        <text x="111" y="111">Соцсфера</text>
+        <text x="2" y="111">Безопасность</text>
+        <text x="0" y="44">Сервисы</text>
+      </svg>
+      <div class="balanced-note">
+        <nz-icon nzType="bar-chart" />
+        <span>Сбалансированный<br />город — устойчивое<br />будущее</span>
+      </div>
     </div>
   </div>
 </section>
-

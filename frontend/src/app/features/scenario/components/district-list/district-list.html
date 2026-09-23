@@ -10,6 +10,7 @@
         type="button"
         class="district-item"
         [class.active]="store.selectedDistrictId() === district.id"
+        [attr.title]="district.profile"
         [style.--district-color]="district.color"
         [style.--district-soft]="district.softColor"
         (click)="store.selectDistrict(district.id)"
@@ -26,10 +27,4 @@
       </button>
     }
   </div>
-
-  <div class="district-detail">
-    <span class="detail-dot" [style.background]="store.selectedDistrict().color"></span>
-    <p>{{ store.selectedDistrict().profile }}</p>
-  </div>
 </section>
-

@@ -10,16 +10,16 @@
   </a>
 
   <nav aria-label="Основная навигация">
-    <a class="active" href="#scenario">Сценарий</a>
-    <a href="#results">Результаты</a>
-    <a href="#comparison">Сравнение команд</a>
-    <a href="#project-info">README</a>
+    <a routerLink="/scenario" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">Сценарий</a>
+    <a routerLink="/results" routerLinkActive="active">Результаты</a>
+    <a routerLink="/comparison" routerLinkActive="active">Сравнение команд</a>
+    <a routerLink="/project-info" routerLinkActive="active">README</a>
   </nav>
 
   <div class="header-actions">
-    <button nz-button nzType="default" type="button">
-      <nz-icon nzType="save" />
-      Сохранить
+    <button nz-button nzType="default" type="button" (click)="store.saveScenario()">
+      <nz-icon [nzType]="store.isSaved() ? 'check' : 'save'" />
+      {{ store.isSaved() ? 'Сохранено' : 'Сохранить' }}
     </button>
     <button nz-button nzType="primary" type="button" (click)="store.restoreDemo()">
       <nz-icon nzType="play-circle" />

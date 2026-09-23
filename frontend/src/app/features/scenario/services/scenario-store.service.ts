@@ -7,6 +7,7 @@ import {
   TOTAL_BUDGET,
 } from '../../../core/data/mock-city.data';
 import { Decision, Direction } from '../../../core/models/city.models';
+import { ScenarioStorageService } from '../../../core/services/scenario-storage.service';
 import { ScenarioCalculatorService } from './scenario-calculator.service';
 
 const INITIAL_DECISIONS: Decision[] = [
@@ -20,6 +21,8 @@ const INITIAL_DECISIONS: Decision[] = [
 @Injectable({ providedIn: 'root' })
 export class ScenarioStoreService {
   private readonly calculator = inject(ScenarioCalculatorService);
+  private readonly storage = inject(ScenarioStorageService);
+  private readonly persistedState = this.storage.load();
 
   readonly totalBudget = TOTAL_BUDGET;
   readonly maxDecisions = MAX_DECISIONS;
@@ -27,11 +30,28 @@ export class ScenarioStoreService {
   readonly measures = MEASURES;
   readonly directionMeta = DIRECTION_META;
 
-  readonly selectedDistrictId = signal('nura');
+  readonly selectedDistrictId = signal(
+    this.isKnownDistrict(this.persistedState?.selectedDistrictId)
+      ? this.persistedState!.selectedDistrictId
+      : 'nura',
+  );
   readonly activeDirection = signal<Direction | 'all'>('all');
   readonly search = signal('');
-  readonly decisions = signal<Decision[]>(INITIAL_DECISIONS);
+  readonly decisions = signal<Decision[]>(
+    this.isRestorable(this.persistedState?.decisions)
+      ? this.persistedState!.decisions
+      : INITIAL_DECISIONS,
+  );
   readonly message = signal<string | null>(null);
+  readonly savedAt = signal<string | null>(this.persistedState?.savedAt ?? null);
+  private readonly savedSignature = signal(
+    this.persistedState
+      ? this.stateSignature(
+          this.persistedState.selectedDistrictId,
+          this.persistedState.decisions,
+        )
+      : null,
+  );
 
   readonly selectedDistrict = computed(() =>
     this.districts.find((item) => item.id === this.selectedDistrictId()) ?? this.districts[0],
@@ -48,6 +68,12 @@ export class ScenarioStoreService {
   readonly remainingBudget = computed(() => this.totalBudget - this.spentBudget());
   readonly result = computed(() => this.calculator.calculate(this.decisions()));
   readonly isComplete = computed(() => this.decisions().length === this.maxDecisions);
+  readonly isSaved = computed(() =>
+    this.savedSignature() === this.stateSignature(
+      this.selectedDistrictId(),
+      this.decisions(),
+    ),
+  );
   readonly coverageCount = computed(() =>
     new Set(
       this.decisions()
@@ -115,6 +141,22 @@ export class ScenarioStoreService {
     this.message.set('Демонстрационный сценарий восстановлен.');
   }
 
+  saveScenario(): void {
+    const saved = this.storage.save({
+      selectedDistrictId: this.selectedDistrictId(),
+      decisions: this.decisions(),
+    });
+    if (!saved) {
+      this.message.set('Не удалось сохранить сценарий в браузере.');
+      return;
+    }
+    this.savedAt.set(saved.savedAt);
+    this.savedSignature.set(
+      this.stateSignature(saved.selectedDistrictId, saved.decisions),
+    );
+    this.message.set('Сценарий сохранён в этом браузере.');
+  }
+
   measureById(id: string) {
     return this.measures.find((item) => item.id === id);
   }
@@ -163,5 +205,25 @@ export class ScenarioStoreService {
     ) return 'Программы M5 и M13 дублируются в выбранном районе.';
     return null;
   }
-}
 
+  private isKnownDistrict(id?: string): boolean {
+    return !!id && this.districts.some((district) => district.id === id);
+  }
+
+  private isRestorable(decisions?: Decision[]): decisions is Decision[] {
+    if (!decisions || decisions.length > this.maxDecisions) return false;
+    const measureIds = new Set<string>();
+    return decisions.every((decision) => {
+      const measure = this.measureById(decision.measureId);
+      if (!measure || measureIds.has(measure.id)) return false;
+      measureIds.add(measure.id);
+      return measure.scope === 'city'
+        ? !decision.districtId
+        : this.isKnownDistrict(decision.districtId);
+    });
+  }
+
+  private stateSignature(districtId: string, decisions: Decision[]): string {
+    return JSON.stringify({ districtId, decisions });
+  }
+}
