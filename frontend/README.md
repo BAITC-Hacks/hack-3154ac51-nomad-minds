@@ -37,7 +37,7 @@ window.__NOMAD_CONFIG__ = {
 ```
 
 По умолчанию API находится на том же домене: настройте обратный прокси для `/api/`
-на backend. Для отдельного backend, в том числе NVIDIA Brev, укажите полный адрес
+на backend. Для отдельного backend укажите полный адрес
 с суффиксом `/api/v1`, например `https://backend.example.com/api/v1`.
 В backend `.env` добавьте домен фронтенда в `CORS_ORIGINS`.
 
