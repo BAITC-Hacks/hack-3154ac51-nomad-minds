@@ -1,5 +1,5 @@
 :host {
-  display: block;
+  display: grid;
   min-width: 0;
   container: catalog / inline-size;
 }
@@ -42,6 +42,21 @@
 
 .catalog-table { padding: 0 12px; }
 .catalog-scroll { max-height: 340px; overflow: auto; }
+
+@media (min-width: 1201px) {
+  .catalog-table {
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .catalog-scroll {
+    flex: 1 1 0;
+    min-height: 340px;
+    max-height: none;
+  }
+}
 
 .catalog-row {
   min-height: 52px;

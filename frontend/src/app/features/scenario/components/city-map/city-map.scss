@@ -1,4 +1,4 @@
-:host { display: block; min-width: 0; width: min(100%, 280px); }
+:host { display: block; min-width: 0; width: 100%; }
 
 .map-panel { position: relative; display: flex; flex-direction: column; aspect-ratio: 1; overflow: hidden; }
 .map-heading { position: absolute; inset: 8px 8px auto; z-index: 600; min-height: 0; padding: 0; flex: 0 0 auto; flex-wrap: nowrap; gap: 6px; }
