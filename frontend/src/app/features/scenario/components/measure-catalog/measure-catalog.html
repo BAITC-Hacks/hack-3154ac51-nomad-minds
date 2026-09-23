@@ -1,0 +1,77 @@
+<section class="panel catalog-panel">
+  <div class="panel-heading catalog-heading">
+    <h2>Каталог мероприятий</h2>
+    <nz-input-group nzPrefixIcon="search">
+      <input
+        nz-input
+        type="search"
+        placeholder="Поиск мероприятий..."
+        [ngModel]="store.search()"
+        (ngModelChange)="store.setSearch($event)"
+      />
+    </nz-input-group>
+  </div>
+
+  <div class="filters" aria-label="Фильтр по направлению">
+    <button
+      type="button"
+      [class.active]="store.activeDirection() === 'all'"
+      (click)="selectDirection('all')"
+    >Все</button>
+    @for (direction of store.directionMeta; track direction.id) {
+      <button
+        type="button"
+        [class.active]="store.activeDirection() === direction.id"
+        [style.--filter-color]="direction.color"
+        (click)="selectDirection(direction.id)"
+      >{{ direction.label }}</button>
+    }
+  </div>
+
+  <div class="catalog-table">
+    <div class="catalog-row table-head">
+      <span>ID</span><span>Мероприятие</span><span>Тип</span><span>Стоимость</span><span>Лаг</span><span>Эффект</span><span></span>
+    </div>
+    <div class="catalog-scroll">
+      @for (measure of store.filteredMeasures(); track measure.id) {
+        @let direction = store.directionById(measure.direction);
+        <div class="catalog-row">
+          <strong>{{ measure.id }}</strong>
+          <span class="measure-title" [title]="measure.name">{{ measure.shortName }}</span>
+          <nz-tag [nzColor]="direction.softColor" [style.color]="direction.color">
+            {{ direction.label }}
+          </nz-tag>
+          <b>{{ measure.cost }}</b>
+          <span>{{ measure.lagQuarters }} кв.</span>
+          <span class="effect">↑ {{ effectLabel(measure.effects) }}</span>
+          <button
+            nz-button
+            nzSize="small"
+            type="button"
+            [nzType]="store.isSelected(measure.id) ? 'default' : 'primary'"
+            [disabled]="store.isSelected(measure.id)"
+            (click)="store.addMeasure(measure.id)"
+          >
+            @if (store.isSelected(measure.id)) {
+              <nz-icon nzType="check" /> Выбрано
+            } @else {
+              Выбрать
+            }
+          </button>
+        </div>
+      } @empty {
+        <div class="catalog-empty">По этому фильтру мероприятий нет</div>
+      }
+    </div>
+  </div>
+
+  <footer class="catalog-footer">
+    <span>
+      Выбранный район: <b [style.color]="store.selectedDistrict().color">{{ store.selectedDistrict().name }}</b>
+    </span>
+    @if (store.message()) {
+      <span class="catalog-message">{{ store.message() }}</span>
+    }
+  </footer>
+</section>
+

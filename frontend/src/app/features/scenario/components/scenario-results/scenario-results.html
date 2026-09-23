@@ -1,0 +1,75 @@
+<section id="results" class="panel results-panel">
+  <div class="panel-heading">
+    <h2><nz-icon nzType="aim" /> Результаты сценария</h2>
+    <button class="help" type="button" aria-label="Как рассчитывается результат">?</button>
+  </div>
+
+  <div class="score-grid">
+    <article class="main-score">
+      <span>Astana Quality of Life Score</span>
+      <strong>{{ store.result().score | number: '1.1-1' }}</strong>
+      <b [class.negative]="store.result().scoreDelta < 0">
+        <nz-icon [nzType]="store.result().scoreDelta >= 0 ? 'arrow-up' : 'arrow-down'" />
+        {{ store.result().scoreDelta >= 0 ? '+' : '' }}{{ store.result().scoreDelta | number: '1.1-1' }} к базе
+      </b>
+    </article>
+    <article class="metric-card">
+      <span>Средний балл<br />города</span>
+      <strong>{{ store.result().cityAverage | number: '1.1-1' }}</strong>
+      <b>↑ {{ store.result().cityAverage - 56.86 | number: '1.1-1' }}</b>
+    </article>
+    <article class="metric-card weakest">
+      <span>Самый слабый<br />район</span>
+      <b>{{ store.districtById(store.result().weakestDistrictId)?.name }}</b>
+      <strong>
+        {{ store.result().districts.at(-1)?.after | number: '1.1-1' }}
+      </strong>
+      <small>Критичных значений: {{ store.result().criticalCount }}</small>
+    </article>
+  </div>
+
+  <div class="district-dynamics">
+    <h3>Динамика по районам</h3>
+    <div class="dynamics-head"><span>Район</span><span>До</span><span>После</span><span>Δ</span></div>
+    @for (result of store.result().districts; track result.districtId) {
+      @let district = store.districtById(result.districtId)!;
+      <div class="dynamics-row">
+        <span class="district-name"><i [style.background]="district.color"></i>{{ district.name }}</span>
+        <span class="bar before"><i [style.width.%]="result.before"></i><b>{{ result.before | number: '1.1-1' }}</b></span>
+        <span class="bar after"><i [style.width.%]="result.after"></i><b>{{ result.after | number: '1.1-1' }}</b></span>
+        <strong>+{{ result.delta | number: '1.1-1' }}</strong>
+      </div>
+    }
+  </div>
+
+  <div class="radar-section">
+    <div class="radar-heading">
+      <h3>Эффект по направлениям</h3>
+      <span><i class="before-key"></i>Базовый</span>
+      <span><i class="after-key"></i>Сценарий</span>
+    </div>
+    <div class="radar-wrap">
+      <svg viewBox="0 0 160 124" role="img" aria-label="Сравнение показателей по пяти направлениям">
+        <polygon points="80,17 122.8,48.1 106.5,98.4 53.5,98.4 37.2,48.1" class="radar-grid outer" />
+        <polygon points="80,32 108.5,52.7 97.6,86.2 62.4,86.2 51.5,52.7" class="radar-grid" />
+        <line x1="80" y1="62" x2="80" y2="17" />
+        <line x1="80" y1="62" x2="122.8" y2="48.1" />
+        <line x1="80" y1="62" x2="106.5" y2="98.4" />
+        <line x1="80" y1="62" x2="53.5" y2="98.4" />
+        <line x1="80" y1="62" x2="37.2" y2="48.1" />
+        <polygon [attr.points]="radarPoints('before')" class="radar-before" />
+        <polygon [attr.points]="radarPoints('after')" class="radar-after" />
+        <text x="80" y="9" text-anchor="middle">Транспорт</text>
+        <text x="127" y="44">Озеленение</text>
+        <text x="111" y="111">Соцсфера</text>
+        <text x="2" y="111">Безопасность</text>
+        <text x="0" y="44">Сервисы</text>
+      </svg>
+      <div class="balanced-note">
+        <nz-icon nzType="bar-chart" />
+        <span>Сбалансированный<br />город — устойчивое<br />будущее</span>
+      </div>
+    </div>
+  </div>
+</section>
+

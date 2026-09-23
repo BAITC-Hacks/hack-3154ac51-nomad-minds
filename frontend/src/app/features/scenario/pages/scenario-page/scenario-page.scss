@@ -1,0 +1,36 @@
+.scenario-page {
+  width: 100%;
+  padding: 12px 16px 18px;
+}
+
+.workspace-top,
+.workspace-bottom {
+  display: grid;
+  gap: 12px;
+  margin-top: 12px;
+  align-items: stretch;
+}
+
+.workspace-top {
+  grid-template-columns: minmax(250px, 0.58fr) minmax(460px, 1.42fr) minmax(480px, 1.18fr);
+}
+
+.workspace-bottom {
+  grid-template-columns: minmax(570px, 1.35fr) minmax(410px, 0.94fr) minmax(390px, 0.9fr);
+}
+
+@media (max-width: 1320px) {
+  .workspace-top { grid-template-columns: 270px minmax(520px, 1fr); }
+  .workspace-top app-selected-decisions { grid-column: 1 / -1; }
+  .workspace-bottom { grid-template-columns: 1fr 1fr; }
+  .workspace-bottom app-measure-catalog { grid-column: 1 / -1; }
+}
+
+@media (max-width: 860px) {
+  .scenario-page { padding: 10px; }
+  .workspace-top,
+  .workspace-bottom { grid-template-columns: 1fr; }
+  .workspace-top app-selected-decisions,
+  .workspace-bottom app-measure-catalog { grid-column: auto; }
+}
+

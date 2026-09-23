@@ -1,0 +1,99 @@
+:host { display: block; min-width: 0; }
+
+.map-panel { min-height: 354px; overflow: hidden; }
+
+.map-heading > div {
+  display: flex;
+  align-items: baseline;
+  gap: 14px;
+  min-width: 0;
+}
+
+.map-heading span {
+  color: #617894;
+  font-size: 10px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.north {
+  width: 30px;
+  height: 30px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  color: #59718f !important;
+  background: #eef4fb;
+  font-size: 16px !important;
+}
+
+.north small { display: none; }
+
+.map-wrap {
+  position: relative;
+  height: 309px;
+}
+
+.map {
+  height: 100%;
+  width: 100%;
+  background: #eaf1f6;
+}
+
+.legend {
+  position: absolute;
+  z-index: 500;
+  top: 12px;
+  right: 50px;
+  display: grid;
+  gap: 4px;
+  padding: 9px 11px;
+  border: 1px solid rgba(203, 220, 235, 0.9);
+  border-radius: 7px;
+  background: rgba(255, 255, 255, 0.92);
+  box-shadow: 0 4px 12px rgba(35, 74, 117, 0.08);
+  backdrop-filter: blur(6px);
+}
+
+.legend button {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0;
+  color: #46617f;
+  background: transparent;
+  border: 0;
+  font-size: 10px;
+  cursor: pointer;
+}
+
+.legend button span {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+}
+
+.map-caption {
+  position: absolute;
+  z-index: 500;
+  left: 13px;
+  bottom: 12px;
+  padding: 7px 10px;
+  color: #31506f;
+  background: rgba(255, 255, 255, 0.86);
+  border-radius: 6px;
+  backdrop-filter: blur(5px);
+}
+
+.map-caption strong,
+.map-caption span { display: block; }
+.map-caption strong { font-size: 12px; }
+.map-caption span { font-size: 9px; line-height: 1.25; }
+
+@media (max-width: 740px) {
+  .map-wrap { height: 330px; }
+  .map-heading > div span { display: none; }
+  .legend { right: 10px; top: 52px; }
+}
+

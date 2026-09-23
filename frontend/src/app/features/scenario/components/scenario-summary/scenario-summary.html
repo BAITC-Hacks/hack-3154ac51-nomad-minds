@@ -1,0 +1,40 @@
+<section class="summary-grid" aria-label="Сводка сценария">
+  <article class="summary-card budget-card">
+    <div class="summary-title">
+      <strong>Бюджет: {{ store.spentBudget() }} / {{ store.totalBudget }}</strong>
+      <span>Осталось {{ store.remainingBudget() }}</span>
+    </div>
+    <nz-progress
+      [nzPercent]="store.spentBudget()"
+      [nzShowInfo]="false"
+      [nzStrokeWidth]="13"
+    />
+    <small>Использовано {{ store.spentBudget() }}% городского бюджета</small>
+  </article>
+
+  <article class="summary-card decision-card">
+    <span class="round-status" [class.complete]="store.isComplete()">
+      <nz-icon [nzType]="store.isComplete() ? 'check' : 'clock-circle'" />
+    </span>
+    <div>
+      <strong>Решений принято:</strong>
+      <b>{{ store.decisions().length }} / {{ store.maxDecisions }}</b>
+      <small>
+        {{ store.isComplete() ? 'Лимит решений достигнут' : 'Можно добавить ещё решений: ' + (store.maxDecisions - store.decisions().length) }}
+      </small>
+    </div>
+  </article>
+
+  <article class="summary-card quote-card">
+    <div>
+      <blockquote>«Город — это не здания,<br />а люди. И их возможности.»</blockquote>
+      <span>Развиваем Астану вместе</span>
+    </div>
+    <div class="time-card">
+      <small>12 апреля 2025</small>
+      <strong>10:24</strong>
+      <span>Время вашего<br />акимата ещё идёт!</span>
+    </div>
+  </article>
+</section>
+

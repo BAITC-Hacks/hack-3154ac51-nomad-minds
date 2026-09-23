@@ -1,0 +1,35 @@
+<section class="panel district-panel">
+  <div class="panel-heading">
+    <h2>Районы города</h2>
+    <nz-icon nzType="right" />
+  </div>
+
+  <div class="districts">
+    @for (district of store.districts; track district.id) {
+      <button
+        type="button"
+        class="district-item"
+        [class.active]="store.selectedDistrictId() === district.id"
+        [style.--district-color]="district.color"
+        [style.--district-soft]="district.softColor"
+        (click)="store.selectDistrict(district.id)"
+      >
+        <span class="district-icon" aria-hidden="true">
+          <nz-icon nzType="bank" />
+        </span>
+        <span class="district-copy">
+          <strong>{{ district.name }}</strong>
+          <small>{{ district.populationShare * 100 | number: '1.0-0' }}% населения</small>
+        </span>
+        <span class="district-score">D: {{ scoreFor(district.id) | number: '1.1-1' }}</span>
+        <nz-icon class="district-chevron" nzType="right" />
+      </button>
+    }
+  </div>
+
+  <div class="district-detail">
+    <span class="detail-dot" [style.background]="store.selectedDistrict().color"></span>
+    <p>{{ store.selectedDistrict().profile }}</p>
+  </div>
+</section>
+

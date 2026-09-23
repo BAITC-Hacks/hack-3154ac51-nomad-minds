@@ -1,0 +1,152 @@
+:host { display: block; min-width: 0; }
+.results-panel { min-height: 384px; }
+.panel-heading h2 nz-icon { color: #1677ff; }
+
+.help {
+  width: 20px;
+  height: 20px;
+  padding: 0;
+  color: #607894;
+  background: #edf3f8;
+  border: 0;
+  border-radius: 50%;
+  font-size: 11px;
+}
+
+.score-grid {
+  display: grid;
+  grid-template-columns: 1.45fr 0.75fr 0.75fr;
+  gap: 7px;
+  padding: 0 12px 10px;
+}
+
+.main-score,
+.metric-card {
+  min-height: 122px;
+  padding: 12px;
+  border: 1px solid #dce8f2;
+  border-radius: 8px;
+  background: #f8fbff;
+}
+
+.main-score {
+  background: linear-gradient(135deg, #f3f9ff, #dff3ff);
+}
+
+.main-score span,
+.metric-card span {
+  display: block;
+  color: #284c7e;
+  font-size: 10px;
+  font-weight: 700;
+}
+
+.main-score strong {
+  display: block;
+  color: #1551b9;
+  font-size: 50px;
+  line-height: 0.98;
+  letter-spacing: -2px;
+}
+
+.main-score b,
+.metric-card b {
+  color: #11a254;
+  font-size: 13px;
+}
+.main-score b.negative { color: #e14747; }
+
+.metric-card strong {
+  display: block;
+  margin-top: 20px;
+  color: #122d5f;
+  font-size: 23px;
+  line-height: 1;
+}
+
+.metric-card.weakest strong { margin: 3px 0; color: #6937d2; }
+.metric-card.weakest > b { display: block; margin-top: 8px; color: #172f5c; font-size: 11px; }
+.metric-card small { color: #647b98; font-size: 8px; }
+
+.district-dynamics { padding: 0 12px 9px; }
+h3 { margin: 0 0 5px; color: #17345f; font-size: 11px; font-weight: 700; }
+
+.dynamics-head,
+.dynamics-row {
+  display: grid;
+  grid-template-columns: 0.9fr 1fr 1fr 42px;
+  align-items: center;
+  gap: 7px;
+  min-height: 21px;
+  font-size: 8px;
+}
+
+.dynamics-head {
+  padding: 0 6px;
+  color: #5b7390;
+  background: #eaf2f9;
+}
+
+.district-name { color: #24466f; font-weight: 600; }
+.district-name i {
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  margin-right: 5px;
+  border-radius: 50%;
+}
+
+.bar {
+  position: relative;
+  height: 9px;
+  display: flex;
+  align-items: center;
+  background: #edf1f6;
+}
+.bar i { display: block; height: 100%; background: #cbd5e1; }
+.bar.after i { background: #4a91f4; }
+.bar b { position: absolute; left: calc(100% + 4px); color: #5b7290; font-size: 8px; }
+.dynamics-row > strong { color: #15984e; text-align: right; }
+
+.radar-section {
+  margin: 0 12px 12px;
+  padding-top: 8px;
+  border-top: 1px solid #e2ecf5;
+}
+.radar-heading { display: flex; align-items: center; gap: 9px; }
+.radar-heading h3 { margin-right: auto; }
+.radar-heading span { color: #617995; font-size: 7px; }
+.radar-heading i { display: inline-block; width: 8px; height: 6px; margin-right: 3px; }
+.before-key { background: #cdd9e7; }
+.after-key { background: #3990f7; }
+
+.radar-wrap { height: 105px; display: flex; align-items: center; gap: 4px; }
+.radar-wrap svg { flex: 1; height: 100%; overflow: visible; }
+.radar-grid { fill: #f4f7fb; stroke: #cbd9e7; stroke-width: 0.8; }
+.radar-grid.outer { fill: transparent; }
+svg line { stroke: #d5e0eb; stroke-width: 0.7; }
+.radar-before { fill: rgba(163, 180, 201, 0.22); stroke: #9fafc2; stroke-width: 1.1; }
+.radar-after { fill: rgba(38, 119, 238, 0.2); stroke: #1677ff; stroke-width: 1.5; }
+svg text { fill: #385a80; font-size: 6px; }
+
+.balanced-note {
+  width: 112px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px;
+  color: #378773;
+  background: #e8faf4;
+  border-radius: 7px;
+  font-size: 7px;
+  line-height: 1.35;
+}
+.balanced-note nz-icon { color: #0dad81; font-size: 18px; }
+
+@media (max-width: 560px) {
+  .score-grid { grid-template-columns: 1.2fr 1fr; }
+  .metric-card.weakest { grid-column: 1 / -1; min-height: 88px; }
+  .dynamics-head,
+  .dynamics-row { grid-template-columns: 1fr 0.9fr 0.9fr 35px; }
+}
+

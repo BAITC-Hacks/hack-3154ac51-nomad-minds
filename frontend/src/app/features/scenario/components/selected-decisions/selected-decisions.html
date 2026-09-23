@@ -1,0 +1,60 @@
+<section class="panel decisions-panel">
+  <div class="panel-heading">
+    <h2>
+      Выбранные решения ({{ store.decisions().length }}/{{ store.maxDecisions }})
+      @if (store.isComplete()) {
+        <nz-icon class="complete-icon" nzType="check-circle" nzTheme="fill" />
+      }
+    </h2>
+    <button nz-button nzSize="small" type="button" (click)="store.reset()">Очистить всё</button>
+  </div>
+
+  <div class="decision-table" role="table" aria-label="Выбранные решения">
+    <div class="decision-row table-head" role="row">
+      <span>ID</span><span>Мероприятие</span><span>Район</span><span>Направление</span><span>Стоимость</span><span></span>
+    </div>
+    @for (decision of store.decisions(); track decision.measureId) {
+      @let measure = store.measureById(decision.measureId)!;
+      @let direction = store.directionById(measure.direction);
+      <div class="decision-row" role="row">
+        <strong>{{ measure.id }}</strong>
+        <span class="measure-name">{{ measure.shortName }}</span>
+        <span [class.district-accent]="decision.districtId">
+          {{ decision.districtId ? store.districtById(decision.districtId)?.name : 'Город' }}
+        </span>
+        <nz-tag
+          [nzColor]="direction.softColor"
+          [style.color]="direction.color"
+        >{{ direction.label }}</nz-tag>
+        <b>{{ measure.cost }}</b>
+        <button
+          class="remove-button"
+          type="button"
+          aria-label="Удалить решение"
+          (click)="store.removeDecision(measure.id)"
+        >
+          <nz-icon nzType="close" />
+        </button>
+      </div>
+    } @empty {
+      <div class="empty-state">
+        <nz-icon nzType="inbox" />
+        <span>Выберите пять инициатив из каталога</span>
+        <button nz-button nzSize="small" type="button" (click)="store.restoreDemo()">
+          Вернуть демо-набор
+        </button>
+      </div>
+    }
+  </div>
+
+  <div class="validation-strip" [class.complete]="store.isComplete()">
+    <strong>
+      <nz-icon [nzType]="store.isComplete() ? 'check-circle' : 'info-circle'" nzTheme="fill" />
+      {{ store.isComplete() ? 'Набор валиден' : 'Соберите 5 решений' }}
+    </strong>
+    <span><nz-icon nzType="check-circle" nzTheme="fill" /> Бюджет не превышен</span>
+    <span><nz-icon nzType="check-circle" nzTheme="fill" /> Повторов нет</span>
+    <span><nz-icon nzType="info-circle" nzTheme="fill" /> Направлений: {{ store.coverageCount() }}/5</span>
+  </div>
+</section>
+

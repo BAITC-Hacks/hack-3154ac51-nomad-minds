@@ -1,2 +1,130 @@
-/* You can add global styles to this file, and also import other style files */
-@import "tailwindcss";
+:root {
+  --app-bg: #f2f7fb;
+  --surface: #ffffff;
+  --text: #102b5c;
+  --muted: #5c7594;
+  --border: #dbe8f4;
+  --primary: #1677ff;
+  --success: #19b866;
+  --radius: 10px;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+  background: var(--app-bg);
+}
+
+body {
+  min-width: 320px;
+  min-height: 100vh;
+  margin: 0;
+  color: var(--text);
+  background:
+    radial-gradient(circle at 55% -10%, rgba(79, 166, 255, 0.12), transparent 30%),
+    var(--app-bg);
+  font-family: Inter, "Segoe UI", Roboto, Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+button,
+input {
+  font: inherit;
+}
+
+a {
+  text-decoration: none;
+}
+
+.panel {
+  min-width: 0;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: 0 4px 16px rgba(25, 73, 125, 0.055);
+}
+
+.panel-heading {
+  min-height: 43px;
+  padding: 9px 13px 7px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.panel-heading h2 {
+  margin: 0;
+  color: #102b5c;
+  font-size: 16px;
+  line-height: 1.2;
+  font-weight: 800;
+  letter-spacing: -0.2px;
+}
+
+.ant-btn {
+  border-radius: 6px;
+  box-shadow: none;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.ant-btn-primary {
+  background: #256cf5;
+  border-color: #256cf5;
+  box-shadow: 0 4px 10px rgba(37, 108, 245, 0.2);
+}
+
+.ant-input,
+.ant-input-affix-wrapper {
+  border-color: #d3e2ef;
+  border-radius: 6px;
+  font-size: 11px;
+}
+
+.ant-progress-line {
+  margin: 1px 0 0;
+}
+
+.ant-progress-inner {
+  background: #e6edf5;
+}
+
+.ant-progress-bg {
+  background: linear-gradient(90deg, #2ea8ff, #109bd7) !important;
+}
+
+.leaflet-container {
+  font-family: inherit;
+}
+
+.leaflet-control-attribution {
+  opacity: 0.72;
+  font-size: 8px !important;
+}
+
+.district-map-label {
+  padding: 2px 5px !important;
+  color: #17345f !important;
+  background: rgba(255, 255, 255, 0.9) !important;
+  border: 0 !important;
+  border-radius: 4px !important;
+  box-shadow: 0 2px 6px rgba(15, 43, 79, 0.14) !important;
+  font-size: 10px !important;
+  font-weight: 700 !important;
+}
+
+.district-map-label::before {
+  display: none !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+  }
+}

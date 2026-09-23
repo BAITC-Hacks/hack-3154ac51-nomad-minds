@@ -1,0 +1,63 @@
+:host { display: block; min-width: 0; }
+.ai-panel { min-height: 384px; }
+.panel-heading h2 nz-icon { color: #1677ff; }
+
+.analysis-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  padding: 0 12px 10px;
+}
+
+.analysis-card {
+  min-height: 104px;
+  padding: 9px 10px;
+  border: 1px solid;
+  border-radius: 7px;
+}
+
+.analysis-card h3 {
+  margin: 0 0 5px;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.analysis-card ul {
+  margin: 0;
+  padding-left: 16px;
+  color: #516b89;
+  font-size: 8.5px;
+  line-height: 1.55;
+}
+
+.strengths { background: #edfaf2; border-color: #c9efd7; }
+.strengths h3 { color: #0f8f48; }
+.risks { background: #fff1f0; border-color: #f6d5d2; }
+.risks h3 { color: #e14747; }
+.tradeoffs { background: #eef6ff; border-color: #d0e5fb; }
+.tradeoffs h3 { color: #1b70d0; }
+.recommendations { background: #fff8ea; border-color: #f3dfb8; }
+.recommendations h3 { color: #d88b0b; }
+
+.ai-note {
+  margin: 0 12px 12px;
+  min-height: 62px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 11px;
+  color: #236853;
+  background: linear-gradient(90deg, #e5f9f2, #f5fcfa);
+  border-radius: 7px;
+}
+
+.ai-note > nz-icon { font-size: 22px; }
+.ai-note strong,
+.ai-note span { display: block; }
+.ai-note strong { font-size: 10px; }
+.ai-note span { margin-top: 2px; color: #578070; font-size: 8px; }
+
+@media (max-width: 540px) {
+  .analysis-grid { grid-template-columns: 1fr; }
+}
+

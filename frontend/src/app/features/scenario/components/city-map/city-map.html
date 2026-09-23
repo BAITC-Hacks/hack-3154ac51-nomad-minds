@@ -1,0 +1,28 @@
+<section class="panel map-panel">
+  <div class="panel-heading map-heading">
+    <div>
+      <h2>Карта районов</h2>
+      <span>Нажмите на район, чтобы выбрать его для новой меры</span>
+    </div>
+    <span class="north" aria-label="Север">
+      <nz-icon nzType="compass" />
+      <small>N</small>
+    </span>
+  </div>
+
+  <div class="map-wrap">
+    <div #mapElement class="map" aria-label="Интерактивная карта районов Астаны"></div>
+    <div class="legend">
+      @for (district of store.districts; track district.id) {
+        <button type="button" (click)="store.selectDistrict(district.id)">
+          <span [style.background]="district.color"></span>{{ district.name }}
+        </button>
+      }
+    </div>
+    <div class="map-caption">
+      <strong>Астана</strong>
+      <span>Больше возможностей<br />для каждого района</span>
+    </div>
+  </div>
+</section>
+

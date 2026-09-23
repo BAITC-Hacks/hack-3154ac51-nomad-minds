@@ -1,0 +1,131 @@
+:host {
+  display: block;
+}
+
+.app-header {
+  min-height: 68px;
+  padding: 0 24px;
+  display: grid;
+  grid-template-columns: minmax(270px, 1fr) auto minmax(320px, 1fr);
+  align-items: center;
+  gap: 20px;
+  background: #fff;
+  border-bottom: 1px solid #dbe8f4;
+  box-shadow: 0 3px 14px rgba(25, 73, 125, 0.06);
+}
+
+.brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  color: #102b5c;
+  width: fit-content;
+}
+
+.brand:hover {
+  color: #102b5c;
+}
+
+.brand strong,
+.brand small {
+  display: block;
+}
+
+.brand strong {
+  font-size: 21px;
+  line-height: 1.1;
+  letter-spacing: -0.4px;
+  font-weight: 800;
+}
+
+.brand small {
+  margin-top: 2px;
+  font-size: 11px;
+  color: #45648b;
+}
+
+.brand-mark {
+  width: 55px;
+  height: 42px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 3px;
+  padding-bottom: 4px;
+  border-bottom: 3px solid #1677ff;
+}
+
+.brand-mark span {
+  width: 7px;
+  border: 2px solid #1677ff;
+  border-bottom: 0;
+  border-radius: 3px 3px 0 0;
+  background: linear-gradient(180deg, #dff1ff, #83c5ff);
+}
+
+.brand-mark span:nth-child(1) { height: 14px; }
+.brand-mark span:nth-child(2) { height: 26px; }
+.brand-mark span:nth-child(3) { height: 37px; }
+.brand-mark span:nth-child(4) { height: 21px; }
+.brand-mark span:nth-child(5) { height: 30px; }
+
+nav {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+nav a {
+  padding: 10px 16px;
+  border-radius: 7px;
+  color: #425d84;
+  font-size: 13px;
+  font-weight: 500;
+  transition: 160ms ease;
+}
+
+nav a:hover {
+  color: #1677ff;
+  background: #f4f9ff;
+}
+
+nav a.active {
+  color: #fff;
+  background: #256cf5;
+  box-shadow: 0 5px 12px rgba(37, 108, 245, 0.24);
+}
+
+.header-actions {
+  justify-self: end;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.user {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-left: 6px;
+  color: #496385;
+  font-size: 12px;
+}
+
+@media (max-width: 1180px) {
+  .app-header {
+    grid-template-columns: 1fr auto;
+  }
+  nav { display: none; }
+}
+
+@media (max-width: 720px) {
+  .app-header {
+    padding: 10px 14px;
+  }
+  .brand strong { font-size: 17px; }
+  .brand-mark { width: 42px; }
+  .header-actions button:first-child,
+  .user span,
+  .user nz-icon { display: none; }
+}
+

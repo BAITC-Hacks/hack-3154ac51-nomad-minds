@@ -1,0 +1,111 @@
+:host { display: block; min-width: 0; }
+
+.catalog-panel {
+  min-height: 384px;
+  display: flex;
+  flex-direction: column;
+}
+
+.catalog-heading nz-input-group { width: min(330px, 52%); }
+
+.filters {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 2px 12px 10px;
+  overflow-x: auto;
+}
+
+.filters button {
+  padding: 5px 15px;
+  color: #4c6685;
+  background: #f7faff;
+  border: 1px solid #dbe7f2;
+  border-radius: 999px;
+  font-size: 10px;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.filters button:hover { color: var(--filter-color, #1677ff); }
+.filters button.active {
+  color: #fff;
+  background: var(--filter-color, #1677ff);
+  border-color: transparent;
+  box-shadow: 0 3px 9px color-mix(in srgb, var(--filter-color, #1677ff) 25%, transparent);
+}
+
+.catalog-table { padding: 0 12px; }
+.catalog-scroll { max-height: 246px; overflow: auto; }
+
+.catalog-row {
+  min-height: 38px;
+  display: grid;
+  grid-template-columns: 34px minmax(135px, 1.5fr) 74px 62px 42px minmax(82px, 0.75fr) 82px;
+  align-items: center;
+  gap: 6px;
+  color: #18345f;
+  border-bottom: 1px solid #e3edf6;
+  font-size: 10px;
+}
+
+.catalog-row.table-head {
+  min-height: 28px;
+  padding-right: 7px;
+  color: #526d8d;
+  background: #edf5fc;
+  border-radius: 5px 5px 0 0;
+  font-size: 9px;
+}
+
+.catalog-row strong { font-size: 10px; }
+.catalog-row b { text-align: center; }
+.measure-title {
+  overflow: hidden;
+  font-weight: 600;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.effect { color: #0c9b50; font-weight: 600; }
+
+.catalog-row nz-tag {
+  width: fit-content;
+  margin: 0;
+  border: 0;
+  font-size: 9px;
+  font-weight: 700;
+}
+
+.catalog-row button { font-size: 10px; }
+.catalog-empty { padding: 42px; text-align: center; color: #7589a2; }
+
+.catalog-footer {
+  margin: auto 12px 10px;
+  padding-top: 7px;
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  color: #607895;
+  border-top: 1px solid #e5eef6;
+  font-size: 9px;
+}
+
+.catalog-message {
+  max-width: 58%;
+  overflow: hidden;
+  color: #315d91;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+@media (max-width: 650px) {
+  .catalog-heading { align-items: stretch; flex-direction: column; }
+  .catalog-heading nz-input-group { width: 100%; }
+  .catalog-row {
+    grid-template-columns: 32px minmax(130px, 1fr) 60px 75px;
+  }
+  .catalog-row > :nth-child(3),
+  .catalog-row > :nth-child(5),
+  .catalog-row > :nth-child(6) { display: none; }
+}
+

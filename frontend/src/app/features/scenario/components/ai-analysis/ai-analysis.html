@@ -1,0 +1,52 @@
+<section class="panel ai-panel">
+  <div class="panel-heading">
+    <h2><nz-icon nzType="robot" /> AI-анализ сценария</h2>
+    <button nz-button nzType="primary" nzSize="small" type="button" [nzLoading]="analyzing" (click)="runAnalysis()">
+      <nz-icon nzType="thunderbolt" /> Получить разбор AI
+    </button>
+  </div>
+
+  <div class="analysis-grid">
+    <article class="analysis-card strengths">
+      <h3><nz-icon nzType="check-circle" nzTheme="fill" /> Сильные стороны</h3>
+      <ul>
+        <li>Значительное усиление Нуры</li>
+        <li>Развитие социальной инфраструктуры</li>
+        <li>Улучшение экологической ситуации</li>
+      </ul>
+    </article>
+    <article class="analysis-card risks">
+      <h3><nz-icon nzType="exclamation-circle" nzTheme="fill" /> Риски</h3>
+      <ul>
+        <li>Недоинвестирование транспорта</li>
+        <li>Риск перегрузки соцобъектов</li>
+        <li>Есиль не охвачен напрямую</li>
+      </ul>
+    </article>
+    <article class="analysis-card tradeoffs">
+      <h3><nz-icon nzType="branches" /> Компромиссы</h3>
+      <ul>
+        <li>Больше соцсферы, меньше транспорта</li>
+        <li>Фокус на Нуре, меньше внимания другим районам</li>
+        <li>Краткосрочный эффект выше долгосрочного</li>
+      </ul>
+    </article>
+    <article class="analysis-card recommendations">
+      <h3><nz-icon nzType="bulb" nzTheme="fill" /> Рекомендации AI</h3>
+      <ul>
+        <li>Рассмотреть транспортную меру M1 или M6</li>
+        <li>Усилить меры для района Есиль</li>
+        <li>Сохранить экологический вектор</li>
+      </ul>
+    </article>
+  </div>
+
+  <div class="ai-note">
+    <nz-icon nzType="safety-certificate" />
+    <div>
+      <strong>Демо-режим без API</strong>
+      <span>Все числа рассчитаны локально. AI-текст пока берётся из мокового адаптера.</span>
+    </div>
+  </div>
+</section>
+
