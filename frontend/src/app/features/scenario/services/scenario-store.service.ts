@@ -66,6 +66,9 @@ export class ScenarioStoreService {
   );
 
   readonly remainingBudget = computed(() => this.totalBudget - this.spentBudget());
+  readonly budgetUsagePercent = computed(() =>
+    Math.min(100, Math.round((this.spentBudget() / this.totalBudget) * 100)),
+  );
   readonly result = computed(() => this.calculator.calculate(this.decisions()));
   readonly isComplete = computed(() => this.decisions().length === this.maxDecisions);
   readonly isSaved = computed(() =>

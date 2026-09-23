@@ -7,8 +7,11 @@
 .workspace-bottom {
   display: grid;
   gap: 12px;
-  margin-top: 12px;
   align-items: stretch;
+}
+
+.workspace-bottom {
+  margin-top: 12px;
 }
 
 .workspace-top {
@@ -33,4 +36,3 @@
   .workspace-top app-selected-decisions,
   .workspace-bottom app-measure-catalog { grid-column: auto; }
 }
-

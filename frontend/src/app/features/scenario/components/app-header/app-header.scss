@@ -3,12 +3,12 @@
 }
 
 .app-header {
-  min-height: 60px;
+  min-height: 72px;
   padding: 0 24px;
   display: grid;
-  grid-template-columns: minmax(270px, 1fr) auto minmax(320px, 1fr);
+  grid-template-columns: minmax(250px, 0.9fr) auto minmax(210px, 0.65fr) auto minmax(300px, 0.8fr);
   align-items: center;
-  gap: 20px;
+  gap: 16px;
   background: #fff;
   border-bottom: 1px solid #dbe8f4;
   box-shadow: 0 3px 14px rgba(25, 73, 125, 0.06);
@@ -95,6 +95,77 @@ nav a.active {
   box-shadow: 0 5px 12px rgba(37, 108, 245, 0.24);
 }
 
+.header-budget {
+  min-width: 210px;
+  padding: 7px 11px 5px;
+  border: 1px solid #d7e5f2;
+  border-radius: 9px;
+  background: #f8fbff;
+}
+
+.budget-copy {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: baseline;
+  gap: 7px;
+  color: #587193;
+  font-size: 10px;
+  line-height: 1;
+}
+
+.budget-copy span {
+  font-weight: 600;
+}
+
+.budget-copy strong {
+  color: #102b5c;
+  font-size: 15px;
+  font-weight: 800;
+}
+
+.budget-copy small {
+  font-size: 9px;
+  white-space: nowrap;
+}
+
+.header-budget ::ng-deep .ant-progress {
+  display: block;
+  margin: 3px 0 0;
+  line-height: 1;
+}
+
+.header-budget ::ng-deep .ant-progress-inner {
+  background: #e4edf6;
+}
+
+.header-budget ::ng-deep .ant-progress-bg {
+  background: linear-gradient(90deg, #33b8f4, #159edc);
+}
+
+.header-clock {
+  min-width: 104px;
+  padding-left: 13px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  border-left: 1px solid #d7e5f2;
+  color: #102b5c;
+  font-variant-numeric: tabular-nums;
+}
+
+.header-clock small {
+  color: #587193;
+  font-size: 10px;
+  line-height: 1.2;
+  white-space: nowrap;
+}
+
+.header-clock strong {
+  margin-top: 3px;
+  font-size: 18px;
+  line-height: 1;
+}
+
 .header-actions {
   justify-self: end;
   display: flex;
@@ -111,20 +182,66 @@ nav a.active {
   font-size: 12px;
 }
 
-@media (max-width: 1180px) {
+@media (max-width: 1420px) {
   .app-header {
-    grid-template-columns: 1fr auto;
+    grid-template-columns: minmax(240px, 1fr) minmax(210px, 0.7fr) auto minmax(300px, auto);
   }
   nav { display: none; }
 }
 
-@media (max-width: 720px) {
+@media (max-width: 960px) {
   .app-header {
     padding: 10px 14px;
+    grid-template-columns: 1fr auto;
+    gap: 8px 14px;
   }
+
+  .header-budget {
+    grid-column: 1;
+    grid-row: 2;
+  }
+
+  .header-clock {
+    grid-column: 2;
+    grid-row: 2;
+  }
+
+  .header-actions {
+    grid-column: 2;
+    grid-row: 1;
+  }
+}
+
+@media (max-width: 720px) {
   .brand strong { font-size: 17px; }
+  .brand small { display: none; }
   .brand-mark { width: 42px; }
-  .header-actions button:first-child,
   .user span,
   .user nz-icon { display: none; }
+}
+
+@media (max-width: 560px) {
+  .app-header {
+    grid-template-columns: 1fr auto;
+  }
+
+  .header-actions button {
+    width: 34px;
+    padding: 0;
+    overflow: hidden;
+    font-size: 0;
+  }
+
+  .header-actions button nz-icon {
+    margin: 0;
+    font-size: 14px;
+  }
+
+  .user {
+    display: none;
+  }
+
+  .header-budget {
+    min-width: 0;
+  }
 }

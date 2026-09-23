@@ -16,6 +16,27 @@
     <a routerLink="/project-info" routerLinkActive="active">README</a>
   </nav>
 
+  <section
+    class="header-budget"
+    [attr.aria-label]="'Бюджет: использовано ' + store.spentBudget() + ' из ' + store.totalBudget"
+  >
+    <div class="budget-copy">
+      <span>Бюджет</span>
+      <strong>{{ store.spentBudget() }} / {{ store.totalBudget }}</strong>
+      <small>Осталось {{ store.remainingBudget() }}</small>
+    </div>
+    <nz-progress
+      [nzPercent]="store.budgetUsagePercent()"
+      [nzShowInfo]="false"
+      [nzStrokeWidth]="6"
+    />
+  </section>
+
+  <time class="header-clock" [attr.datetime]="now().toISOString()">
+    <small>{{ currentDate() }}</small>
+    <strong>{{ currentTime() }}</strong>
+  </time>
+
   <div class="header-actions">
     <button nz-button nzType="default" type="button" (click)="store.saveScenario()">
       <nz-icon [nzType]="store.isSaved() ? 'check' : 'save'" />

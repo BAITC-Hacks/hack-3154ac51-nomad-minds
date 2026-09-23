@@ -780,7 +780,7 @@ readonly isLoading = signal(false);
 
 ```html
 @if (isLoading()) {
-  <nz-spin />
+<nz-spin />
 }
 ```
 
@@ -788,7 +788,7 @@ readonly isLoading = signal(false);
 
 ```html
 @for (user of users(); track user.id) {
-  ...
+...
 }
 ```
 
