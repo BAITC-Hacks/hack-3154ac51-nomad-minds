@@ -1,17 +1,20 @@
 :host {
   display: block;
+  position: sticky;
+  top: 0;
+  z-index: 900;
 }
 
 .app-header {
   min-height: 72px;
   padding: 0 24px;
   display: grid;
-  grid-template-columns: minmax(250px, 0.9fr) auto minmax(210px, 0.65fr) auto minmax(300px, 0.8fr);
+  grid-template-columns: minmax(290px, 0.9fr) auto minmax(260px, 0.65fr) auto auto;
   align-items: center;
   gap: 16px;
   background: #fff;
   border-bottom: 1px solid #dbe8f4;
-  box-shadow: 0 3px 14px rgba(25, 73, 125, 0.06);
+  box-shadow: 0 3px 14px rgba(25, 73, 125, 0.12);
 }
 
 .brand {
@@ -30,11 +33,11 @@
 .brand small {
   display: block;
 }
-.brand .api-status { font-size: 10px; color: #a66b1e; }
-.brand .api-status.connected { color: #16804a; }
+.brand .api-status { font-size: 12px; color: #805015; }
+.brand .api-status.connected { color: #126b3e; }
 
 .brand strong {
-  font-size: 21px;
+  font-size: 24px;
   line-height: 1.1;
   letter-spacing: -0.4px;
   font-weight: 800;
@@ -42,8 +45,9 @@
 
 .brand small {
   margin-top: 2px;
-  font-size: 13px;
-  color: #45648b;
+  font-size: 14px;
+  line-height: 1.35;
+  color: #344e70;
 }
 
 .brand-mark {
@@ -78,27 +82,28 @@ nav {
 }
 
 nav a {
-  padding: 10px 16px;
+  padding: 10px 14px;
   border-radius: 7px;
-  color: #425d84;
-  font-size: 15px;
-  font-weight: 500;
+  color: #263f60;
+  font-size: 17px;
+  line-height: 1.35;
+  font-weight: 600;
   transition: 160ms ease;
 }
 
 nav a:hover {
-  color: #1677ff;
+  color: #1754b6;
   background: #f4f9ff;
 }
 
 nav a.active {
   color: #fff;
-  background: #256cf5;
+  background: #205bd5;
   box-shadow: 0 5px 12px rgba(37, 108, 245, 0.24);
 }
 
 .header-budget {
-  min-width: 210px;
+  min-width: 0;
   padding: 7px 11px 5px;
   border: 1px solid #d7e5f2;
   border-radius: 9px;
@@ -106,13 +111,13 @@ nav a.active {
 }
 
 .budget-copy {
-  display: grid;
-  grid-template-columns: auto 1fr auto;
+  display: flex;
+  flex-wrap: wrap;
   align-items: baseline;
-  gap: 7px;
-  color: #587193;
-  font-size: 12px;
-  line-height: 1;
+  gap: 3px 8px;
+  color: #344e70;
+  font-size: 14px;
+  line-height: 1.25;
 }
 
 .budget-copy span {
@@ -121,12 +126,13 @@ nav a.active {
 
 .budget-copy strong {
   color: #102b5c;
-  font-size: 17px;
+  font-size: 19px;
   font-weight: 800;
+  white-space: nowrap;
 }
 
 .budget-copy small {
-  font-size: 11px;
+  font-size: 13px;
   white-space: nowrap;
 }
 
@@ -156,15 +162,15 @@ nav a.active {
 }
 
 .header-clock small {
-  color: #587193;
-  font-size: 12px;
+  color: #344e70;
+  font-size: 14px;
   line-height: 1.2;
   white-space: nowrap;
 }
 
 .header-clock strong {
   margin-top: 3px;
-  font-size: 18px;
+  font-size: 20px;
   line-height: 1;
 }
 
@@ -180,13 +186,13 @@ nav a.active {
   align-items: center;
   gap: 8px;
   margin-left: 6px;
-  color: #496385;
-  font-size: 14px;
+  color: #344e70;
+  font-size: 16px;
 }
 
-@media (max-width: 1600px) {
+@media (max-width: 1900px) {
   .app-header {
-    grid-template-columns: minmax(240px, 1fr) minmax(210px, 0.7fr) auto minmax(300px, auto);
+    grid-template-columns: minmax(290px, 1fr) minmax(210px, 0.7fr) auto auto;
     padding-top: 10px;
     padding-bottom: 10px;
   }
@@ -199,10 +205,10 @@ nav a.active {
   nav a { white-space: nowrap; }
 }
 
-@media (max-width: 960px) {
+@media (max-width: 1200px) {
   .app-header {
     padding: 10px 14px;
-    grid-template-columns: 1fr auto;
+    grid-template-columns: minmax(0, 1fr) auto;
     gap: 8px 14px;
   }
 
@@ -223,8 +229,12 @@ nav a.active {
   nav { grid-row: 3; }
 }
 
+@media (max-width: 960px) {
+  .user { display: none; }
+}
+
 @media (max-width: 720px) {
-  .brand strong { font-size: 19px; }
+  .brand strong { font-size: 22px; }
   .brand small { display: none; }
   .brand-mark { width: 42px; }
   .user span,
@@ -233,11 +243,19 @@ nav a.active {
 
 @media (max-width: 560px) {
   .app-header {
-    grid-template-columns: 1fr auto;
+    padding: 8px 10px;
+    gap: 8px;
   }
 
+  .brand { gap: 8px; }
+  .brand strong { font-size: 20px; }
+  .brand-mark { width: 32px; height: 38px; gap: 2px; }
+  .brand-mark span { width: 5px; }
+  .header-actions { gap: 6px; }
+
   .header-actions button {
-    width: 34px;
+    width: 36px;
+    height: 36px;
     padding: 0;
     overflow: hidden;
     font-size: 0;
@@ -253,6 +271,12 @@ nav a.active {
   }
 
   .header-budget {
-    min-width: 0;
+    padding: 6px 8px 4px;
   }
+
+  .budget-copy { column-gap: 6px; }
+  .budget-copy strong { font-size: 18px; }
+  .header-clock { padding-left: 8px; }
+  nav { gap: 4px; }
+  nav a { padding: 8px 12px; }
 }

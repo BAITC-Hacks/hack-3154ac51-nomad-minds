@@ -3,26 +3,27 @@
 .panel-heading h2 nz-icon { color: #1677ff; }
 
 .help {
-  width: 20px;
-  height: 20px;
+  width: 26px;
+  height: 26px;
   padding: 0;
-  color: #607894;
+  color: var(--muted);
   background: #edf3f8;
   border: 0;
   border-radius: 50%;
-  font-size: 13px;
+  font-size: 15px;
 }
 
 .score-grid {
   display: grid;
-  grid-template-columns: 1.45fr 0.75fr 0.75fr;
-  gap: 7px;
-  padding: 0 12px 10px;
+  grid-template-columns: minmax(0, 1.3fr) repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  padding: 0 12px 16px;
 }
 
 .main-score,
 .metric-card {
   min-height: 122px;
+  min-width: 0;
   padding: 12px;
   border: 1px solid #dce8f2;
   border-radius: 8px;
@@ -36,58 +37,59 @@
 .main-score span,
 .metric-card span {
   display: block;
-  color: #284c7e;
-  font-size: 12px;
+  color: var(--text);
+  font-size: 15px;
   font-weight: 700;
 }
 
 .main-score strong {
   display: block;
   color: #1551b9;
-  font-size: 50px;
-  line-height: 0.98;
+  margin: 10px 0;
+  font-size: clamp(42px, 4vw, 54px);
+  line-height: 1.1;
   letter-spacing: -2px;
 }
 
 .main-score b,
 .metric-card b {
-  color: #11a254;
-  font-size: 15px;
+  color: #147443;
+  font-size: 16px;
 }
-.main-score b.negative { color: #e14747; }
+.main-score b.negative { color: #b62d36; }
 
 .metric-card strong {
   display: block;
   margin-top: 20px;
   color: #122d5f;
-  font-size: 23px;
-  line-height: 1;
+  font-size: 30px;
+  line-height: 1.2;
 }
 
 .metric-card.weakest strong { margin: 3px 0; color: #6937d2; }
-.metric-card.weakest > b { display: block; margin-top: 8px; color: #172f5c; font-size: 13px; }
-.metric-card small { color: #647b98; font-size: 10px; }
+.metric-card.weakest > b { display: block; margin-top: 8px; color: var(--text); font-size: 16px; overflow-wrap: anywhere; }
+.metric-card small { color: var(--muted); font-size: 14px; }
 
-.district-dynamics { padding: 0 12px 9px; }
-h3 { margin: 0 0 5px; color: #17345f; font-size: 13px; font-weight: 700; }
+.district-dynamics { padding: 0 12px 14px; }
+h3 { margin: 0 0 10px; color: var(--text); font-size: 17px; font-weight: 700; }
 
 .dynamics-head,
 .dynamics-row {
   display: grid;
-  grid-template-columns: 0.9fr 1fr 1fr 42px;
+  grid-template-columns: minmax(0, 1fr) repeat(2, minmax(0, 1fr)) 50px;
   align-items: center;
   gap: 7px;
-  min-height: 27px;
-  font-size: 10px;
+  min-height: 38px;
+  font-size: 14px;
 }
 
 .dynamics-head {
   padding: 0 6px;
-  color: #5b7390;
+  color: var(--muted);
   background: #eaf2f9;
 }
 
-.district-name { color: #24466f; font-weight: 600; }
+.district-name { min-width: 0; color: var(--text); font-weight: 600; overflow-wrap: anywhere; }
 .district-name i {
   display: inline-block;
   width: 7px;
@@ -105,16 +107,16 @@ h3 { margin: 0 0 5px; color: #17345f; font-size: 13px; font-weight: 700; }
 }
 .bar-track {
   display: block;
-  height: 9px;
+  height: 10px;
   overflow: hidden;
   background: #edf1f6;
 }
 .bar i { display: block; height: 100%; background: #cbd5e1; }
 .bar.after i { background: #4a91f4; }
-.bar b { color: #5b7290; font-size: 10px; text-align: right; white-space: nowrap; font-variant-numeric: tabular-nums; }
-.dynamics-row > strong { color: #15984e; text-align: right; }
+.bar b { color: var(--muted); font-size: 14px; text-align: right; white-space: nowrap; font-variant-numeric: tabular-nums; }
+.dynamics-row > strong { color: #147443; text-align: right; white-space: nowrap; font-variant-numeric: tabular-nums; }
 .metric-card b.negative,
-.dynamics-row > strong.negative { color: #e14747; }
+.dynamics-row > strong.negative { color: #b62d36; }
 .results-empty {
   min-height: 280px;
   padding: 24px;
@@ -124,13 +126,17 @@ h3 { margin: 0 0 5px; color: #17345f; font-size: 13px; font-weight: 700; }
   justify-content: center;
   gap: 10px;
   text-align: center;
-  color: #617995;
+  color: var(--muted);
+  font-size: 16px;
 }
 .results-empty nz-icon { color: #1677ff; font-size: 32px; }
 
 @media (max-width: 560px) {
-  .score-grid { grid-template-columns: 1.2fr 1fr; }
+  .score-grid { grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); }
   .metric-card.weakest { grid-column: 1 / -1; min-height: 88px; }
   .dynamics-head,
-  .dynamics-row { grid-template-columns: 1fr 0.9fr 0.9fr 35px; }
+  .dynamics-row { grid-template-columns: minmax(0, 1.2fr) repeat(2, minmax(0, 0.8fr)) 46px; gap: 6px; }
+  .dynamics-row { min-height: 52px; }
+  .bar { grid-template-columns: minmax(0, 1fr); }
+  .bar-track { grid-row: 2; height: 6px; }
 }

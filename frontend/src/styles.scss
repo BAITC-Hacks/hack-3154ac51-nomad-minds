@@ -1,8 +1,8 @@
 :root {
   --app-bg: #f2f7fb;
   --surface: #ffffff;
-  --text: #102b5c;
-  --muted: #5c7594;
+  --text: #142b49;
+  --muted: #42566f;
   --border: #dbe8f4;
   --primary: #1677ff;
   --success: #19b866;
@@ -26,13 +26,16 @@ body {
   background:
     radial-gradient(circle at 55% -10%, rgba(79, 166, 255, 0.12), transparent 30%),
     var(--app-bg);
-  font-size: 16px;
+  font-size: 18px;
+  font-weight: 500;
+  line-height: 1.5;
   font-family: Inter, "Segoe UI", Roboto, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
 }
 
 button,
-input {
+input,
+select,
+textarea {
   font: inherit;
 }
 
@@ -49,41 +52,83 @@ a {
 }
 
 .panel-heading {
-  min-height: 43px;
-  padding: 9px 13px 7px;
+  min-height: 54px;
+  padding: 12px 14px 10px;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 12px;
+  flex-wrap: wrap;
 }
 
 .panel-heading h2 {
   margin: 0;
-  color: #102b5c;
-  font-size: 18px;
-  line-height: 1.2;
+  color: var(--text);
+  font-size: 22px;
+  line-height: 1.3;
   font-weight: 800;
   letter-spacing: -0.2px;
 }
 
 .ant-btn {
+  height: auto;
+  min-height: 38px;
+  padding: 6px 12px;
+  color: var(--text);
   border-radius: 6px;
   box-shadow: none;
-  font-size: 13px;
+  font-size: 15px;
   font-weight: 600;
 }
 
 .ant-btn-primary {
+  color: #fff;
   background: #256cf5;
   border-color: #256cf5;
   box-shadow: 0 4px 10px rgba(37, 108, 245, 0.2);
 }
 
+.ant-btn-sm {
+  min-height: 32px;
+  padding: 3px 8px;
+}
+
+.ant-btn[disabled],
+.ant-btn[disabled]:hover {
+  color: #536176;
+  background: #edf1f6;
+  border-color: #cbd5e1;
+}
+
 .ant-input,
 .ant-input-affix-wrapper {
+  color: var(--text);
   border-color: #d3e2ef;
   border-radius: 6px;
-  font-size: 13px;
+  font-size: 16px;
+  line-height: 1.5;
+}
+
+.ant-input::placeholder {
+  color: #536176;
+  opacity: 1;
+}
+
+.ant-table,
+.ant-alert,
+.ant-empty,
+.ant-pagination {
+  color: var(--text);
+  font-size: 16px;
+}
+
+.ant-table-thead > tr > th {
+  color: var(--text);
+  font-weight: 700;
+}
+
+.ant-empty-description {
+  color: var(--muted);
 }
 
 .ant-progress-line {
@@ -103,8 +148,12 @@ a {
 }
 
 .leaflet-control-attribution {
-  opacity: 0.72;
-  font-size: 10px !important;
+  color: var(--muted);
+  font-size: 12px !important;
+}
+
+.leaflet-control-attribution a {
+  color: #17549d;
 }
 
 .district-map-label {
@@ -114,7 +163,7 @@ a {
   border: 0 !important;
   border-radius: 4px !important;
   box-shadow: 0 2px 6px rgba(15, 43, 79, 0.14) !important;
-  font-size: 12px !important;
+  font-size: 14px !important;
   font-weight: 700 !important;
 }
 
@@ -124,7 +173,7 @@ a {
 
 .map-panel.is-fullscreen .district-map-label {
   padding: 4px 7px !important;
-  font-size: 14px !important;
+  font-size: 16px !important;
 }
 
 @media (prefers-reduced-motion: reduce) {

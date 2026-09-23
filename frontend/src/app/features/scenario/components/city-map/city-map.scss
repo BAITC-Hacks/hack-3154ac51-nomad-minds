@@ -3,7 +3,7 @@
 .map-panel { display: flex; flex-direction: column; height: 100%; overflow: hidden; }
 .map-heading { flex: 0 0 auto; flex-wrap: wrap; }
 .map-title { display: flex; align-items: baseline; flex-wrap: wrap; gap: 4px 12px; }
-.map-title span { color: #617894; font-size: 13px; }
+.map-title span { color: var(--muted); font-size: 15px; }
 .map-actions { display: flex; align-items: center; gap: 6px; }
 
 .map-action {
@@ -17,7 +17,7 @@
   border-radius: 6px;
   color: #315579;
   background: #f5f9fd;
-  font-size: 13px;
+  font-size: 15px;
   font-weight: 600;
   cursor: pointer;
 }
@@ -26,7 +26,7 @@
 .map-action svg { width: 16px; height: 16px; }
 .city-reset { width: 32px; padding: 6px; font-size: 18px; }
 
-.map-wrap { position: relative; flex: 1 0 420px; min-height: 0; }
+.map-wrap { position: relative; isolation: isolate; flex: 1 0 420px; min-height: 0; }
 .map { height: 100%; width: 100%; position: absolute; inset: 0; background: #eaf1f6; }
 .north {
   position: absolute;
@@ -44,7 +44,7 @@
   font-size: 21px;
   pointer-events: none;
 }
-.north span { font-size: 11px; font-weight: 700; }
+.north span { font-size: 14px; font-weight: 700; }
 .map-footer { flex: 0 0 auto; padding: 10px 12px; border-top: 1px solid #dbe8f4; }
 .legend { display: flex; flex-wrap: wrap; gap: 4px; }
 .legend button {
@@ -53,17 +53,17 @@
   gap: 6px;
   min-height: 30px;
   padding: 5px 8px;
-  color: #46617f;
+  color: var(--muted);
   background: transparent;
   border: 1px solid transparent;
   border-radius: 6px;
-  font-size: 13px;
+  font-size: 15px;
   cursor: pointer;
 }
 .legend button:hover { background: #f1f6fc; }
 .legend button.active { border-color: #bbd5f1; background: #edf5ff; color: #17345f; }
 .legend button span { width: 8px; height: 8px; border-radius: 50%; }
-.map-footer p { margin: 6px 0 0; color: #617894; font-size: 12px; line-height: 1.5; }
+.map-footer p { margin: 6px 0 0; color: var(--muted); font-size: 14px; line-height: 1.5; }
 .map-footer p span { display: inline-block; }
 .map-status {
   position: absolute;
@@ -78,7 +78,7 @@
   background: white;
   box-shadow: 0 4px 18px #234a7526;
   text-align: center;
-  font-size: 14px;
+  font-size: 16px;
 }
 .map-status button { padding: 6px; border: 1px solid #bbd5f1; border-radius: 4px; background: #edf5ff; cursor: pointer; }
 
@@ -100,7 +100,7 @@
   .map-wrap { flex-basis: 380px; }
   .map-heading { gap: 8px; }
   .map-title { flex-direction: column; }
-  .map-title h2 { font-size: 17px; }
+  .map-title h2 { font-size: 22px; }
   .map-action { min-height: 36px; }
   .city-reset { width: 36px; }
   .legend button { min-height: 36px; }

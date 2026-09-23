@@ -38,7 +38,7 @@
         <div class="catalog-row">
           <strong>{{ measure.id }}</strong>
           <span class="measure-title" [title]="measure.name">{{ measure.shortName }}</span>
-          <nz-tag [nzColor]="direction.softColor" [style.color]="direction.color">
+          <nz-tag [nzColor]="direction.softColor" [style.--direction-color]="direction.color">
             {{ direction.label }}
           </nz-tag>
           <b>{{ measure.cost }}</b>
@@ -67,7 +67,7 @@
 
   <footer class="catalog-footer">
     @if (store.selectedDistrict(); as district) {
-      <span>Выбранный район: <b [style.color]="district.color">{{ district.name }}</b></span>
+      <span>Выбранный район: <b [style.--district-color]="district.color">{{ district.name }}</b></span>
     }
   </footer>
 </section>

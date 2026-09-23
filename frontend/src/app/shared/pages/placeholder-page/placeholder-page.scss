@@ -35,7 +35,7 @@ h1 {
 
 p {
   margin: 0 0 18px;
-  color: #607895;
+  color: var(--muted);
   line-height: 1.6;
 }
 
@@ -45,7 +45,7 @@ p {
   color: #41705f;
   background: #edf9f4;
   border-radius: 7px;
-  font-size: 13px;
+  font-size: 16px;
 }
 
 .status-line nz-icon {
