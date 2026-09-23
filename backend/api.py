@@ -12,16 +12,17 @@ if __package__ in {None, ""}:
     sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from backend.dataset_repository import load_all_datasets
-from backend.scenario_repository import DATABASE_PATH, list_scenarios, save_scenario
+from backend.scenario_repository import list_scenarios, save_scenario
 from backend.schemas import SaveScenarioRequest, ScenarioRequest
 from backend.scoring import calculate_baseline, calculate_scenario, validate_decisions
+from backend.settings import settings
 
 
 app = FastAPI(title="Akim for 5 Hours API", version="1.0.0")
-SCENARIO_DB_PATH = DATABASE_PATH
+SCENARIO_DB_PATH = settings.database_path
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=settings.cors_origin_list,
     allow_methods=["GET", "POST"],
     allow_headers=["*"],
 )
@@ -113,4 +114,4 @@ def legacy_districts() -> dict[str, Any]:
 if __name__ == "__main__":
     import uvicorn
 
-    uvicorn.run(app, host="127.0.0.1", port=8000)
+    uvicorn.run(app, host=settings.host, port=settings.port)
