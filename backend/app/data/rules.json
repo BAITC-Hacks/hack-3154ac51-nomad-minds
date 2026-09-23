@@ -6,6 +6,18 @@
   "simulationHorizonQuarters": 8,
   "indicatorMinimum": 0,
   "indicatorMaximum": 100,
+  "indicatorWeights": {
+    "T1": 0.10,
+    "T2": 0.10,
+    "E1": 0.09,
+    "E2": 0.11,
+    "S1": 0.11,
+    "S2": 0.11,
+    "B1": 0.09,
+    "B2": 0.09,
+    "C1": 0.10,
+    "C2": 0.10
+  },
   "incompatibleMeasures": [
     ["M1", "M3"]
   ],

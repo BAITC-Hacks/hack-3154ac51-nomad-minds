@@ -1,68 +1,100 @@
-"""Проверка установки и импорта библиотек для ИИ-бэкенда."""
+"""FastAPI application for the city scenario simulator."""
 
-import importlib
-import importlib.metadata
-import subprocess
 import sys
+from pathlib import Path
+from typing import Any
+
+from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+
+# Support both `python backend/api.py` and `uvicorn backend.api:app`.
+if __package__ in {None, ""}:
+    sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+
+from backend.dataset_repository import load_all_datasets
+from backend.schemas import ScenarioRequest
+from backend.scoring import calculate_baseline, calculate_scenario, validate_decisions
 
 
-LIBRARIES = [
-    ("fastapi", "fastapi"),
-    ("uvicorn", "uvicorn"),
-    ("pydantic", "pydantic"),
-    ("pydantic-settings", "pydantic_settings"),
-    ("httpx", "httpx"),
-    ("pytest", "pytest"),
-    ("pytest-asyncio", "pytest_asyncio"),
-    ("ruff", None),
-]
+app = FastAPI(title="Akim for 5 Hours API", version="1.0.0")
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_methods=["GET", "POST"],
+    allow_headers=["*"],
+)
 
 
-def main():
-    print(f"Python: {sys.version.split()[0]}")
-    print(f"Интерпретатор: {sys.executable}\n")
-    working = 0
-    missing = []
-    broken = []
+def _decision_dicts(request: ScenarioRequest) -> list[dict[str, Any]]:
+    return [decision.model_dump(exclude_none=True) for decision in request.decisions]
 
-    for package, module in LIBRARIES:
-        try:
-            version = importlib.metadata.version(package)
-        except importlib.metadata.PackageNotFoundError:
-            print(f"[НЕТ] {package}: не установлен")
-            missing.append(package)
-            continue
 
-        try:
-            if module is not None:
-                importlib.import_module(module)
-            else:
-                # Ruff проверяем как CLI-инструмент, а не только как модуль.
-                subprocess.run(
-                    [sys.executable, "-m", "ruff", "--version"],
-                    capture_output=True,
-                    text=True,
-                    timeout=15,
-                    check=True,
-                )
-            print(f"[OK] {package} {version}")
-            working += 1
-        except Exception as error:
-            print(f"[ОШИБКА] {package} {version}: {type(error).__name__}: {error}")
-            if isinstance(error, subprocess.CalledProcessError) and error.stderr:
-                print(error.stderr.strip())
-            broken.append(package)
+@app.get("/")
+def root() -> dict[str, str]:
+    return {
+        "service": "Akim for 5 Hours API",
+        "health": "/api/v1/health",
+        "dataset": "/api/v1/dataset",
+        "documentation": "/docs",
+    }
 
-    print(f"\nПроверку прошли: {working}/{len(LIBRARIES)}")
-    print(f"Не установлены: {len(missing)}. С ошибками: {len(broken)}.")
-    print("Проверяется импорт библиотек и запуск Ruff, а не работа всего сервиса.")
-    
-    if missing:
-        packages = " ".join(missing)
-        print("\nУстановить недостающие в этот Python (PowerShell):")
-        print(f'& "{sys.executable}" -m pip install {packages}')
-    return 1 if missing or broken else 0
+
+@app.get("/api/v1/health")
+def health() -> dict[str, str]:
+    return {"status": "ok", "aiProvider": "not_configured"}
+
+
+@app.get("/api/v1/dataset")
+def get_dataset() -> dict[str, Any]:
+    data = load_all_datasets()
+    baseline = calculate_baseline(data)
+    return {
+        "datasetVersion": data["rules"]["datasetVersion"],
+        "budget": data["rules"]["budget"],
+        "baselineScore": baseline["score"],
+        "districts": data["districts"]["districts"],
+        "measures": data["measures"]["measures"],
+        "rules": data["rules"],
+    }
+
+
+@app.post("/api/v1/scenarios/validate")
+def validate_scenario(request: ScenarioRequest) -> dict[str, Any]:
+    decisions = _decision_dicts(request)
+    data = load_all_datasets()
+    errors = validate_decisions(decisions, data, allow_partial=True)
+    measures = {item["id"]: item for item in data["measures"]["measures"]}
+    spent = sum(
+        measures[item["measureId"]]["cost"]
+        for item in decisions
+        if item["measureId"] in measures
+    )
+    total = data["rules"]["budget"]
+    return {
+        "valid": not errors,
+        "complete": len(decisions) == data["rules"]["requiredDecisionCount"] and not errors,
+        "validationErrors": errors,
+        "budget": {"total": total, "spent": spent, "remaining": total - spent},
+    }
+
+
+@app.post("/api/v1/scenarios/calculate")
+def calculate(request: ScenarioRequest) -> dict[str, Any]:
+    return calculate_scenario(_decision_dicts(request))
+
+
+# Temporary compatibility routes for the first local prototype.
+@app.get("/health", include_in_schema=False)
+def legacy_health() -> dict[str, str]:
+    return health()
+
+
+@app.get("/districts", include_in_schema=False)
+def legacy_districts() -> dict[str, Any]:
+    return {"districts": load_all_datasets()["districts"]["districts"]}
 
 
 if __name__ == "__main__":
-    sys.exit(main())
+    import uvicorn
+
+    uvicorn.run(app, host="127.0.0.1", port=8000)
