@@ -257,3 +257,9 @@ npm run build
 В текущей конфигурации репозитория публичная ссылка на работающий экземпляр не указана. Для демонстрации используйте локальный запуск выше.
 
 Для размещения frontend адрес backend задаётся в `frontend/public/config.js` (или `config.js` внутри готовой сборки) полем `apiBaseUrl`, включая `/api/v1`. Значение по умолчанию `/api/v1` требует прокси на том же домене. При разных доменах настройте `CORS_ORIGINS` backend. Подробности — в [frontend/README.md](frontend/README.md).
+
+<img width="1728" height="886" alt="image" src="https://github.com/user-attachments/assets/55cfcc05-4ba2-4428-a23e-ceb9814e88da" />
+<img width="1728" height="1117" alt="image" src="https://github.com/user-attachments/assets/10cab10e-b8f5-4557-8301-9b48b57d1fa1" />
+<img width="1727" height="886" alt="image" src="https://github.com/user-attachments/assets/ae5fa307-2954-45ad-b116-74bf56aaa97f" />
+
+<img width="1727" height="514" alt="image" src="https://github.com/user-attachments/assets/5b88613a-cef8-4cde-ad59-13d92364a8bd" />
