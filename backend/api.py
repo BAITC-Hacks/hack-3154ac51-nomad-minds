@@ -11,9 +11,10 @@ from fastapi.middleware.cors import CORSMiddleware
 if __package__ in {None, ""}:
     sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
+from backend.ai_adapter import analyze_result
 from backend.dataset_repository import load_all_datasets
 from backend.scenario_repository import list_scenarios, save_scenario
-from backend.schemas import SaveScenarioRequest, ScenarioRequest
+from backend.schemas import AnalyzeScenarioRequest, SaveScenarioRequest, ScenarioRequest
 from backend.scoring import calculate_baseline, calculate_scenario, validate_decisions
 from backend.settings import settings
 
@@ -44,7 +45,11 @@ def root() -> dict[str, str]:
 
 @app.get("/api/v1/health")
 def health() -> dict[str, str]:
-    return {"status": "ok", "aiProvider": "not_configured"}
+    configured = bool(
+        settings.openai_api_key
+        and settings.openai_api_key.get_secret_value().strip()
+    )
+    return {"status": "ok", "aiProvider": "openai" if configured else "fallback"}
 
 
 @app.get("/api/v1/dataset")
@@ -84,6 +89,14 @@ def validate_scenario(request: ScenarioRequest) -> dict[str, Any]:
 @app.post("/api/v1/scenarios/calculate")
 def calculate(request: ScenarioRequest) -> dict[str, Any]:
     return calculate_scenario(_decision_dicts(request))
+
+
+@app.post("/api/v1/scenarios/analyze")
+def analyze(request: AnalyzeScenarioRequest) -> dict[str, Any]:
+    try:
+        return analyze_result(request.result)
+    except ValueError as error:
+        raise HTTPException(status_code=400, detail=str(error)) from error
 
 
 @app.post("/api/v1/scenarios", status_code=201)

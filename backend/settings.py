@@ -2,7 +2,7 @@
 
 from pathlib import Path
 
-from pydantic import computed_field
+from pydantic import SecretStr, computed_field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -17,6 +17,9 @@ class Settings(BaseSettings):
     port: int = 8000
     cors_origins: str = "http://localhost:4200,http://127.0.0.1:4200"
     database_path: Path = Path("backend/app.db")
+    openai_api_key: SecretStr | None = None
+    openai_model: str = "gpt-4o-mini"
+    openai_timeout_seconds: float = 30.0
 
     @computed_field
     @property

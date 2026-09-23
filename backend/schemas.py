@@ -1,5 +1,7 @@
 """Pydantic request models shared by the FastAPI endpoints."""
 
+from typing import Any
+
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 
@@ -26,3 +28,9 @@ class SaveScenarioRequest(ScenarioRequest):
         if not value:
             raise ValueError("Scenario name must not be blank.")
         return value
+
+
+class AnalyzeScenarioRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    result: dict[str, Any]

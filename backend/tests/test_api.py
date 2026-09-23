@@ -3,6 +3,7 @@
 import pytest
 from fastapi.testclient import TestClient
 
+import backend.api as api_module
 from backend.api import app
 
 
@@ -95,6 +96,33 @@ def test_incomplete_calculation_is_rejected_by_business_validation():
     assert body["valid"] is False
     assert body["validationErrors"]
     assert "score" not in body
+
+
+def test_analysis_endpoint_uses_structured_result(monkeypatch):
+    calculated = client.post(
+        "/api/v1/scenarios/calculate", json={"decisions": REFERENCE_DECISIONS}
+    ).json()
+    monkeypatch.setattr(
+        api_module,
+        "analyze_result",
+        lambda result: {
+            "summary": f"Score: {result['score']:.2f}",
+            "strengths": [], "risks": [], "tradeoffs": [],
+            "recommendations": [], "source": "test", "model": None,
+        },
+    )
+    response = client.post(
+        "/api/v1/scenarios/analyze", json={"result": calculated}
+    )
+    assert response.status_code == 200
+    assert response.json()["summary"] == "Score: 56.54"
+
+
+def test_analysis_rejects_invalid_result():
+    response = client.post(
+        "/api/v1/scenarios/analyze", json={"result": {"valid": False}}
+    )
+    assert response.status_code == 400
 
 
 @pytest.mark.parametrize("payload", [

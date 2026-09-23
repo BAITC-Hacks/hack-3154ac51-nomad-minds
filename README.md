@@ -29,6 +29,9 @@ Copy `.env.example` to `.env` and change values when needed:
 - `PORT`: HTTP port, default `8000`.
 - `CORS_ORIGINS`: comma-separated frontend origins.
 - `DATABASE_PATH`: SQLite path for saved scenarios.
+- `OPENAI_API_KEY`: secret API key; leave empty to use the fallback.
+- `OPENAI_MODEL`: model used for structured analysis, default `gpt-4o-mini`.
+- `OPENAI_TIMEOUT_SECONDS`: provider timeout before the fallback is returned.
 
 The `.env` file can contain secrets later and must not be committed.
 
@@ -39,6 +42,7 @@ GET  /api/v1/health
 GET  /api/v1/dataset
 POST /api/v1/scenarios/validate
 POST /api/v1/scenarios/calculate
+POST /api/v1/scenarios/analyze
 POST /api/v1/scenarios
 GET  /api/v1/scenarios
 ```
