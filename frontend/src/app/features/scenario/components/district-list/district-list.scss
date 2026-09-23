@@ -55,14 +55,14 @@
 }
 
 .district-copy strong {
-  font-size: 13px;
+  font-size: 15px;
   line-height: 1.2;
 }
 
 .district-copy small {
   margin-top: 3px;
   color: #536e90;
-  font-size: 10px;
+  font-size: 12px;
 }
 
 .district-score {
@@ -70,10 +70,10 @@
   border-radius: 4px;
   color: color-mix(in srgb, var(--district-color) 82%, #0b2146);
   background: var(--district-soft);
-  font-size: 11px;
+  font-size: 13px;
   font-weight: 700;
   white-space: nowrap;
 }
 
-.district-chevron { color: #67809e; font-size: 10px; }
+.district-chevron { color: #67809e; font-size: 12px; }
 

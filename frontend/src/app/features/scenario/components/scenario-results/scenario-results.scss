@@ -10,7 +10,7 @@
   background: #edf3f8;
   border: 0;
   border-radius: 50%;
-  font-size: 11px;
+  font-size: 13px;
 }
 
 .score-grid {
@@ -37,7 +37,7 @@
 .metric-card span {
   display: block;
   color: #284c7e;
-  font-size: 10px;
+  font-size: 12px;
   font-weight: 700;
 }
 
@@ -52,7 +52,7 @@
 .main-score b,
 .metric-card b {
   color: #11a254;
-  font-size: 13px;
+  font-size: 15px;
 }
 .main-score b.negative { color: #e14747; }
 
@@ -65,11 +65,11 @@
 }
 
 .metric-card.weakest strong { margin: 3px 0; color: #6937d2; }
-.metric-card.weakest > b { display: block; margin-top: 8px; color: #172f5c; font-size: 11px; }
-.metric-card small { color: #647b98; font-size: 8px; }
+.metric-card.weakest > b { display: block; margin-top: 8px; color: #172f5c; font-size: 13px; }
+.metric-card small { color: #647b98; font-size: 10px; }
 
 .district-dynamics { padding: 0 12px 9px; }
-h3 { margin: 0 0 5px; color: #17345f; font-size: 11px; font-weight: 700; }
+h3 { margin: 0 0 5px; color: #17345f; font-size: 13px; font-weight: 700; }
 
 .dynamics-head,
 .dynamics-row {
@@ -78,7 +78,7 @@ h3 { margin: 0 0 5px; color: #17345f; font-size: 11px; font-weight: 700; }
   align-items: center;
   gap: 7px;
   min-height: 27px;
-  font-size: 8px;
+  font-size: 10px;
 }
 
 .dynamics-head {
@@ -105,7 +105,7 @@ h3 { margin: 0 0 5px; color: #17345f; font-size: 11px; font-weight: 700; }
 }
 .bar i { display: block; height: 100%; background: #cbd5e1; }
 .bar.after i { background: #4a91f4; }
-.bar b { position: absolute; left: calc(100% + 4px); color: #5b7290; font-size: 8px; }
+.bar b { position: absolute; left: calc(100% + 4px); color: #5b7290; font-size: 10px; }
 .dynamics-row > strong { color: #15984e; text-align: right; }
 
 @media (max-width: 560px) {

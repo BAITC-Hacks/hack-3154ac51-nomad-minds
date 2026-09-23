@@ -26,6 +26,7 @@ body {
   background:
     radial-gradient(circle at 55% -10%, rgba(79, 166, 255, 0.12), transparent 30%),
     var(--app-bg);
+  font-size: 16px;
   font-family: Inter, "Segoe UI", Roboto, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
 }
@@ -59,7 +60,7 @@ a {
 .panel-heading h2 {
   margin: 0;
   color: #102b5c;
-  font-size: 16px;
+  font-size: 18px;
   line-height: 1.2;
   font-weight: 800;
   letter-spacing: -0.2px;
@@ -68,7 +69,7 @@ a {
 .ant-btn {
   border-radius: 6px;
   box-shadow: none;
-  font-size: 11px;
+  font-size: 13px;
   font-weight: 600;
 }
 
@@ -82,7 +83,7 @@ a {
 .ant-input-affix-wrapper {
   border-color: #d3e2ef;
   border-radius: 6px;
-  font-size: 11px;
+  font-size: 13px;
 }
 
 .ant-progress-line {
@@ -103,7 +104,7 @@ a {
 
 .leaflet-control-attribution {
   opacity: 0.72;
-  font-size: 8px !important;
+  font-size: 10px !important;
 }
 
 .district-map-label {
@@ -113,12 +114,17 @@ a {
   border: 0 !important;
   border-radius: 4px !important;
   box-shadow: 0 2px 6px rgba(15, 43, 79, 0.14) !important;
-  font-size: 10px !important;
+  font-size: 12px !important;
   font-weight: 700 !important;
 }
 
 .district-map-label::before {
   display: none !important;
+}
+
+.map-panel.is-fullscreen .district-map-label {
+  padding: 4px 7px !important;
+  font-size: 14px !important;
 }
 
 @media (prefers-reduced-motion: reduce) {

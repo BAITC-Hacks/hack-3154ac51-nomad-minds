@@ -3,36 +3,33 @@
   padding: 12px 16px 18px;
 }
 
-.workspace-top,
-.workspace-bottom {
+.workspace-row {
   display: grid;
   gap: 12px;
   align-items: stretch;
 }
 
-.workspace-bottom {
+.workspace-row + .workspace-row {
   margin-top: 12px;
 }
 
-.workspace-top {
-  grid-template-columns: minmax(250px, 0.58fr) minmax(460px, 1.42fr) minmax(480px, 1.18fr);
+.workspace-districts {
+  grid-template-columns: minmax(270px, 0.3fr) minmax(0, 1fr);
 }
 
-.workspace-bottom {
-  grid-template-columns: minmax(570px, 1.35fr) minmax(410px, 0.94fr) minmax(390px, 0.9fr);
+.workspace-decisions {
+  grid-template-columns: minmax(570px, 1.2fr) minmax(480px, 1fr);
 }
 
-@media (max-width: 1320px) {
-  .workspace-top { grid-template-columns: 270px minmax(520px, 1fr); }
-  .workspace-top app-selected-decisions { grid-column: 1 / -1; }
-  .workspace-bottom { grid-template-columns: 1fr 1fr; }
-  .workspace-bottom app-measure-catalog { grid-column: 1 / -1; }
+.workspace-results {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+@media (max-width: 1100px) {
+  .workspace-decisions { grid-template-columns: minmax(0, 1fr); }
 }
 
 @media (max-width: 860px) {
   .scenario-page { padding: 10px; }
-  .workspace-top,
-  .workspace-bottom { grid-template-columns: 1fr; }
-  .workspace-top app-selected-decisions,
-  .workspace-bottom app-measure-catalog { grid-column: auto; }
+  .workspace-row { grid-template-columns: minmax(0, 1fr); }
 }
