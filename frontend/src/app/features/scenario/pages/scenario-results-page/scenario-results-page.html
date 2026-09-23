@@ -1,0 +1,13 @@
+<main class="scenario-results-page">
+  <header class="results-heading">
+    <div>
+      <p>Результаты расчёта</p>
+      <h1>{{ store.scenarioName().trim() || 'Мой сценарий' }}</h1>
+    </div>
+    <a nz-button routerLink="/scenario">Вернуться к сценарию</a>
+  </header>
+  <section class="results-grid" aria-label="Результаты и AI-анализ сценария">
+    <app-scenario-results />
+    <app-ai-analysis />
+  </section>
+</main>

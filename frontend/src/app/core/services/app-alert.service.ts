@@ -16,7 +16,7 @@ const TITLES: Record<AppAlertType, string> = {
   warning: 'Обратите внимание',
   error: 'Не удалось выполнить действие',
 };
-const DISPLAY_MS = 6000;
+const DISPLAY_MS = 5000;
 
 @Injectable({ providedIn: 'root' })
 export class AppAlertService {
@@ -38,7 +38,7 @@ export class AppAlertService {
     if (previous) this.dismiss(previous.id);
     const id = ++this.nextId;
     this.items.update((items) => [{ id, type, message, title: options.title ?? TITLES[type], key: options.key }, ...items]);
-    this.resume(id);
+    this.timers.set(id, setTimeout(() => this.dismiss(id), DISPLAY_MS));
     return id;
   }
 
@@ -47,21 +47,9 @@ export class AppAlertService {
   }
 
   dismiss(id: number): void {
-    this.pause(id);
-    this.items.update((items) => items.filter((item) => item.id !== id));
-  }
-
-  pause(id: number): void {
     const timer = this.timers.get(id);
     if (timer !== undefined) clearTimeout(timer);
     this.timers.delete(id);
-  }
-
-  resume(id: number): void {
-    this.pause(id);
-    const alert = this.items().find((item) => item.id === id);
-    if (alert?.type === 'success' || alert?.type === 'info') {
-      this.timers.set(id, setTimeout(() => this.dismiss(id), DISPLAY_MS));
-    }
+    this.items.update((items) => items.filter((item) => item.id !== id));
   }
 }

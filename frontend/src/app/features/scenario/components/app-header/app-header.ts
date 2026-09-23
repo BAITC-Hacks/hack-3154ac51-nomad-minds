@@ -1,7 +1,6 @@
 import { Component, computed, DestroyRef, inject, signal } from '@angular/core';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 import { NzAvatarModule } from 'ng-zorro-antd/avatar';
-import { NzButtonModule } from 'ng-zorro-antd/button';
 import { NzIconModule } from 'ng-zorro-antd/icon';
 import { NzProgressModule } from 'ng-zorro-antd/progress';
 import { ScenarioStoreService } from '../../services/scenario-store.service';
@@ -10,7 +9,6 @@ import { ScenarioStoreService } from '../../services/scenario-store.service';
   selector: 'app-header',
   imports: [
     NzAvatarModule,
-    NzButtonModule,
     NzIconModule,
     NzProgressModule,
     RouterLink,

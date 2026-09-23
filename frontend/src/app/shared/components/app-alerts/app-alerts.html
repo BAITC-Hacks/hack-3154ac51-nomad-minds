@@ -4,10 +4,6 @@
       class="app-alert"
       [attr.role]="alert.type === 'error' || alert.type === 'warning' ? 'alert' : 'status'"
       aria-atomic="true"
-      (mouseenter)="notifications.pause(alert.id)"
-      (mouseleave)="notifications.resume(alert.id)"
-      (focusin)="notifications.pause(alert.id)"
-      (focusout)="notifications.resume(alert.id)"
     >
       <nz-alert
         [nzType]="alert.type"

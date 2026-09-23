@@ -24,14 +24,14 @@
 }
 
 .workspace-planning {
-  grid-template-columns: minmax(310px, 340px) minmax(0, 1fr);
+  grid-template-columns: minmax(280px, 310px) minmax(0, 1fr);
   align-items: start;
 }
 
 .workspace-decisions {
   min-width: 0;
   display: grid;
-  grid-template-columns: minmax(0, 1fr);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 12px;
   align-items: start;
 }
@@ -40,17 +40,14 @@
   grid-template-columns: minmax(0, 1fr);
 }
 
-.workspace-results {
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-}
-
-@media (min-width: 1920px) {
-  .workspace-decisions {
-    grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
+@media (max-width: 1200px) {
+  .workspace-planning {
+    grid-template-columns: minmax(0, 1fr);
   }
 }
 
 @media (max-width: 860px) {
   .scenario-page { padding: 10px; }
   .workspace-row { grid-template-columns: minmax(0, 1fr); }
+  .workspace-decisions { grid-template-columns: minmax(0, 1fr); }
 }

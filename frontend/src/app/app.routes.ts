@@ -3,6 +3,13 @@ import { Routes } from '@angular/router';
 export const routes: Routes = [
   { path: '', pathMatch: 'full', redirectTo: 'scenario' },
   {
+    path: 'scenario/results',
+    loadComponent: () =>
+      import('./features/scenario/pages/scenario-results-page/scenario-results-page').then(
+        (component) => component.ScenarioResultsPage,
+      ),
+  },
+  {
     path: 'scenario',
     loadComponent: () =>
       import('./features/scenario/pages/scenario-page/scenario-page').then(

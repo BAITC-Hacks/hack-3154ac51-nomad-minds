@@ -81,11 +81,11 @@
       <small class="name-error">Введите название, чтобы сохранить сценарий.</small>
     }
     <div class="action-buttons">
-      <button nz-button nzType="primary" type="button" aria-label="Рассчитать сценарий" [nzLoading]="store.isCalculating()" [disabled]="!store.canCalculate()" (click)="store.calculateScenario()">
+      <button nz-button nzType="primary" type="button" aria-label="Рассчитать сценарий" [nzLoading]="store.isCalculating()" [disabled]="!store.canCalculate()" (click)="calculateAndOpenResults()">
         <nz-icon nzType="play-circle" aria-hidden="true" /> Рассчитать сценарий
       </button>
-      <button nz-button type="button" [attr.aria-label]="store.isSaved() ? 'Сохранено' : 'Сохранить сценарий'" [nzLoading]="store.isSaving()" [disabled]="!store.canSave() || store.isSaved()" (click)="store.saveScenario()">
-        <nz-icon [nzType]="store.isSaved() ? 'check' : 'save'" aria-hidden="true" /> {{ store.isSaved() ? 'Сохранено' : 'Сохранить сценарий' }}
+      <button nz-button type="button" [attr.aria-label]="store.isSaved() ? 'Сохранено в истории' : 'Сохранить в историю'" [nzLoading]="store.isSaving()" [disabled]="!store.canSave() || store.isSaved()" (click)="store.saveScenario()">
+        <nz-icon [nzType]="store.isSaved() ? 'check' : 'save'" aria-hidden="true" /> {{ store.isSaved() ? 'Сохранено в истории' : 'Сохранить в историю' }}
       </button>
     </div>
   </div>

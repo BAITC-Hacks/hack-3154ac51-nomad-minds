@@ -33,8 +33,6 @@
 .brand small {
   display: block;
 }
-.brand .api-status { font-size: 12px; color: #805015; }
-.brand .api-status.connected { color: #126b3e; }
 
 .brand strong {
   font-size: 24px;
@@ -190,7 +188,7 @@ nav a.active {
   font-size: 16px;
 }
 
-@media (max-width: 1900px) {
+@media (max-width: 1280px) {
   .app-header {
     grid-template-columns: minmax(290px, 1fr) minmax(210px, 0.7fr) auto auto;
     padding-top: 10px;
@@ -252,19 +250,6 @@ nav a.active {
   .brand-mark { width: 32px; height: 38px; gap: 2px; }
   .brand-mark span { width: 5px; }
   .header-actions { gap: 6px; }
-
-  .header-actions button {
-    width: 36px;
-    height: 36px;
-    padding: 0;
-    overflow: hidden;
-    font-size: 0;
-  }
-
-  .header-actions button nz-icon {
-    margin: 0;
-    font-size: 16px;
-  }
 
   .user {
     display: none;
