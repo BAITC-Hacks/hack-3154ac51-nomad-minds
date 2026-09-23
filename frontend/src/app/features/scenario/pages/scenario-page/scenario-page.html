@@ -10,14 +10,14 @@
   }
   @if (store.hasDataset()) {
   <section class="workspace-row workspace-planning" aria-label="Районы города и планирование решений">
-    <app-district-list />
+    <div class="workspace-districts">
+      <app-district-list />
+      <app-city-map />
+    </div>
     <div class="workspace-decisions">
       <app-measure-catalog />
       <app-selected-decisions />
     </div>
-  </section>
-  <section class="workspace-row workspace-map" aria-label="Карта районов города">
-    <app-city-map />
   </section>
   }
 </main>

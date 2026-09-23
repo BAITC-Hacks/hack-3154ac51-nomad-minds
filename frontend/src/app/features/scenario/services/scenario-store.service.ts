@@ -12,9 +12,9 @@ import {
 } from '../../../core/api/utils/scenario-api.mapper';
 import { DIRECTION_META } from '../../../core/api/models/city-presentation';
 import { Decision, Direction } from '../../../core/models/city.models';
-import { AppAlertService } from '../../../core/services/app-alert.service';
+import { AppAlertService, AppAlertType } from '../../../core/services/app-alert.service';
 
-const INITIAL_DECISIONS: Decision[] = [
+const DEMO_DECISIONS: Decision[] = [
   { measureId: 'M7', districtId: 'nura' },
   { measureId: 'M8', districtId: 'nura' },
   { measureId: 'M10', districtId: 'nura' },
@@ -152,15 +152,10 @@ export class ScenarioStoreService {
     ).subscribe({
       next: ({ dataset, health }) => {
         this.alerts.clear('scenario.dataset');
-        const firstLoad = !this.hasDataset();
         this.dataset.set(dataset);
         this.health.set(health);
         if (!this.districtById(this.selectedDistrictId())) {
           this.selectedDistrictId.set(this.districts()[0]?.id ?? '');
-        }
-        if (firstLoad) {
-          const demo = INITIAL_DECISIONS.map((decision) => ({ ...decision }));
-          this.decisions.set(this.isRestorable(demo) ? demo : []);
         }
         this.validateScenario();
       },
@@ -203,7 +198,7 @@ export class ScenarioStoreService {
           return;
         }
         this.serverResult.set(result);
-        this.notify('success', 'Сценарий рассчитан. Можно запросить AI-анализ или сохранить результат.', 'scenario.calculation');
+        this.alerts.clear('scenario.calculation');
       },
       error: (error: unknown) => this.notify('error', toUserMessage(error, 'Не удалось рассчитать сценарий. Попробуйте ещё раз.'), 'scenario.calculation'),
     });
@@ -220,11 +215,7 @@ export class ScenarioStoreService {
     ).subscribe({
       next: (analysis) => {
         this.analysis.set(mapAnalysis(analysis));
-        if (analysis.source === 'fallback') {
-          this.notify('warning', 'AI-анализ недоступен. Подготовлен базовый анализ по рассчитанным показателям.', 'scenario.analysis');
-        } else {
-          this.notify('success', 'AI-анализ готов. Ознакомьтесь с выводами и рекомендациями.', 'scenario.analysis');
-        }
+        this.alerts.clear('scenario.analysis');
       },
       error: (error: unknown) => this.notify('error', toUserMessage(error, 'Не удалось получить AI-анализ. Попробуйте ещё раз.'), 'scenario.analysis'),
     });
@@ -249,7 +240,7 @@ export class ScenarioStoreService {
           this.savedAt.set(saved.createdAt);
           this.serverResult.set(saved.result);
         }
-        this.notify('success', `Сценарий «${saved.name}» сохранён на сервере и доступен в истории результатов.`, 'scenario.save');
+        this.alerts.clear('scenario.save');
       },
       error: (error: unknown) => this.notify('error', toUserMessage(error, 'Не удалось сохранить сценарий. Попробуйте ещё раз.'), 'scenario.save'),
     });
@@ -297,7 +288,7 @@ export class ScenarioStoreService {
     this.savedSignature.set(this.stateSignature(saved.name, saved.decisions));
     const district = saved.decisions.find((decision) => decision.districtId)?.districtId;
     if (district) this.selectedDistrictId.set(district);
-    this.notify('success', `Открыт сохранённый сценарий «${saved.name}».`, 'scenario.open');
+    this.alerts.clear('scenario.open');
     return true;
   }
 
@@ -305,7 +296,6 @@ export class ScenarioStoreService {
     const district = this.districtById(id);
     if (!district || this.selectedDistrictId() === id) return;
     this.selectedDistrictId.set(id);
-    this.notify('info', `Выбран район ${district.name}. Мероприятия будут добавляться для этого района.`, 'scenario.district');
   }
 
   setDirection(direction: Direction | 'all'): void { this.activeDirection.set(direction); }
@@ -320,27 +310,22 @@ export class ScenarioStoreService {
     const error = this.validateAddition(candidate);
     if (error) { this.notify('warning', error, 'scenario.addition'); return; }
     this.replaceDecisions([...this.decisions(), candidate]);
-    this.notify('success', `${measure.shortName}: добавлено ${measure.scope === 'city'
-      ? 'для всего города' : `для района ${this.selectedDistrict()?.name}`}`, 'scenario.addition');
   }
 
   removeDecision(measureId: string): void {
     if (!this.isSelected(measureId)) return;
     this.replaceDecisions(this.decisions().filter((item) => item.measureId !== measureId));
-    this.notify('info', 'Решение удалено. Можно выбрать другую инициативу.', 'scenario.selection');
   }
 
   reset(): void {
     this.replaceDecisions([]);
-    this.notify('info', `Сценарий очищен. Выберите ${this.maxDecisions()} решений.`, 'scenario.selection');
   }
 
   restoreDemo(): void {
-    const demo = INITIAL_DECISIONS.map((decision) => ({ ...decision }));
+    const demo = DEMO_DECISIONS.map((decision) => ({ ...decision }));
     if (!this.hasDataset() || !this.isRestorable(demo)) return;
     this.replaceDecisions(demo);
     this.selectedDistrictId.set('nura');
-    this.notify('success', 'Демонстрационный набор восстановлен. Рассчитайте его на сервере.', 'scenario.selection');
   }
 
   measureById(id: string) { return this.measures().find((item) => item.id === id); }
@@ -362,7 +347,7 @@ export class ScenarioStoreService {
     this.validateScenario();
   }
 
-  private notify(type: 'success' | 'info' | 'warning' | 'error', message: string, key: string): void {
+  private notify(type: AppAlertType, message: string, key: string): void {
     this.message.set(message);
     this.alerts.notify(type, message, { key });
   }
@@ -373,7 +358,7 @@ export class ScenarioStoreService {
     if (!measure || !rules) return 'Мероприятие не найдено.';
     if (this.isSelected(measure.id)) return 'Это мероприятие уже выбрано.';
     if (this.decisions().length >= rules.requiredDecisionCount) return `Уже выбрано ${rules.requiredDecisionCount} решений. Сначала удалите одно из них.`;
-    if (this.spentBudget() + measure.cost > rules.budget) return `Не хватает ${this.spentBudget() + measure.cost - rules.budget} единиц бюджета.`;
+    if (this.spentBudget() + measure.cost > rules.budget) return `Не хватает ${this.spentBudget() + measure.cost - rules.budget} млн бюджета.`;
     const count = this.decisions().filter((decision) => this.measureById(decision.measureId)?.direction === measure.direction).length;
     if (count >= rules.maxMeasuresPerDirection) return `Можно выбрать не более ${rules.maxMeasuresPerDirection} мер одного направления.`;
     for (const [first, second] of rules.incompatibleMeasures) {

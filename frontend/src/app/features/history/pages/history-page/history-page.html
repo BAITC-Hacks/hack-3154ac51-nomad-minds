@@ -53,7 +53,7 @@
             <td [class.positive]="scenario.result.scoreDelta > 0" [class.negative]="scenario.result.scoreDelta < 0">
               {{ scenario.result.scoreDelta > 0 ? '+' : '' }}{{ scenario.result.scoreDelta | number: '1.1-1' }}
             </td>
-            <td>{{ scenario.result.budget.spent }} / {{ scenario.result.budget.total }}</td>
+            <td>{{ scenario.result.budget.spent }} / {{ scenario.result.budget.total }} млн</td>
             <td>{{ scenario.decisions.length }}</td>
             <td>
               <button nz-button type="button" [disabled]="!store.hasDataset()" (click)="openScenario(scenario)">

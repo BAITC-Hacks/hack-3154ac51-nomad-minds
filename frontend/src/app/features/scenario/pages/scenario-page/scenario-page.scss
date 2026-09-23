@@ -19,10 +19,6 @@
   align-items: stretch;
 }
 
-.workspace-row + .workspace-row {
-  margin-top: 12px;
-}
-
 .workspace-planning {
   grid-template-columns: minmax(280px, 310px) minmax(0, 1fr);
   align-items: start;
@@ -36,13 +32,19 @@
   align-items: start;
 }
 
-.workspace-map {
-  grid-template-columns: minmax(0, 1fr);
+.workspace-districts {
+  min-width: 0;
+  display: grid;
+  gap: 12px;
 }
 
 @media (max-width: 1200px) {
   .workspace-planning {
     grid-template-columns: minmax(0, 1fr);
+  }
+  .workspace-districts {
+    grid-template-columns: minmax(0, 1fr) 280px;
+    align-items: start;
   }
 }
 
@@ -50,4 +52,8 @@
   .scenario-page { padding: 10px; }
   .workspace-row { grid-template-columns: minmax(0, 1fr); }
   .workspace-decisions { grid-template-columns: minmax(0, 1fr); }
+}
+
+@media (max-width: 620px) {
+  .workspace-districts { grid-template-columns: minmax(0, 1fr); }
 }

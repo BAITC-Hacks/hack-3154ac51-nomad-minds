@@ -60,7 +60,7 @@ describe('scenario API mapping', () => {
     expect(translateValidationError('Measures M4 and M7 are incompatible in the same district: nura.')).toContain('Нура');
     expect(toUserMessage(new HttpErrorResponse({
       status: 400, error: { detail: ['Budget exceeded: 105 of 100.'] },
-    }), 'Ошибка')).toBe('Превышен бюджет: 105 из 100.');
+    }), 'Ошибка')).toBe('Превышен бюджет: 105 млн из 100 млн.');
     expect(toUserMessage(new HttpErrorResponse({ status: 500, error: { detail: 'internal stack trace' } }), 'Ошибка сохранения')).toBe('Ошибка сохранения');
   });
 
@@ -76,7 +76,7 @@ describe('scenario API mapping', () => {
     expect(result.summary).toBe('Оценка города меняется с 52.56 до 56.54 (+3.99).');
     expect(result.strengths).toEqual(['Соцсфера: изменение +1.50.']);
     expect(result.risks[0]).toContain('Нура');
-    expect(result.tradeoffs).toEqual(['Использовано 95 из 100 единиц бюджета.']);
+    expect(result.tradeoffs).toEqual(['Использовано 95 млн из 100 млн бюджета.']);
   });
 
   it('keeps server explanations that have no bundled translation', () => {

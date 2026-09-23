@@ -2,7 +2,7 @@
   @for (alert of notifications.alerts(); track alert.id) {
     <div
       class="app-alert"
-      [attr.role]="alert.type === 'error' || alert.type === 'warning' ? 'alert' : 'status'"
+      role="alert"
       aria-atomic="true"
     >
       <nz-alert

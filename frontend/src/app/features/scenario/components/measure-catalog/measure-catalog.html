@@ -1,7 +1,8 @@
 <section class="panel catalog-panel">
   <div class="panel-heading catalog-heading">
     <h2>Каталог мероприятий</h2>
-    <nz-input-group nzPrefixIcon="search">
+    <nz-input-wrapper>
+      <nz-icon nzInputPrefix nzType="search" />
       <input
         nz-input
         type="search"
@@ -9,7 +10,7 @@
         [ngModel]="store.search()"
         (ngModelChange)="store.setSearch($event)"
       />
-    </nz-input-group>
+    </nz-input-wrapper>
   </div>
 
   <div class="filters" aria-label="Фильтр по направлению">
@@ -30,34 +31,31 @@
 
   <div class="catalog-table">
     <div class="catalog-row table-head">
-      <span>ID</span><span>Мероприятие</span><span>Тип</span><span>Стоимость</span><span>Лаг</span><span>Эффект</span><span></span>
+      <span>ID</span><span>Мероприятие</span><span>Тип</span><span>Стоимость</span><span>Лаг</span><span>Эффект</span><span class="selection-heading">Выбор</span>
     </div>
     <div class="catalog-scroll">
       @for (measure of store.filteredMeasures(); track measure.id) {
         @let direction = store.directionById(measure.direction);
-        <div class="catalog-row">
+        <div class="catalog-row" [class.is-selected]="store.isSelected(measure.id)">
           <strong>{{ measure.id }}</strong>
           <span class="measure-title" [title]="measure.name">{{ measure.shortName }}</span>
           <nz-tag [nzColor]="direction.softColor" [style.--direction-color]="direction.color">
             {{ direction.label }}
           </nz-tag>
-          <b>{{ measure.cost }}</b>
+          <b class="measure-cost">{{ measure.cost }} млн</b>
           <span>{{ measure.lagQuarters }} кв.</span>
           <span class="effect">↑ {{ effectLabel(measure.effects) }}</span>
-          <button
-            nz-button
-            nzSize="small"
-            type="button"
-            [nzType]="store.isSelected(measure.id) ? 'default' : 'primary'"
-            [disabled]="store.isSelected(measure.id) || !store.hasDataset() || store.isSaving() || store.isCalculating() || store.isAnalyzing()"
-            (click)="store.addMeasure(measure.id)"
-          >
-            @if (store.isSelected(measure.id)) {
-              <nz-icon nzType="check" /> Выбрано
-            } @else {
-              Выбрать
-            }
-          </button>
+          <label class="measure-selection" [title]="store.isSelected(measure.id) ? 'Убрать из сценария' : 'Добавить в сценарий'">
+            <input
+              #selection
+              type="checkbox"
+              [attr.aria-label]="'Выбрать мероприятие: ' + measure.name"
+              [checked]="store.isSelected(measure.id)"
+              [disabled]="!store.hasDataset() || store.isSaving() || store.isCalculating() || store.isAnalyzing()"
+              (change)="toggleMeasure(measure.id, selection)"
+            />
+            <span class="selection-check" aria-hidden="true"></span>
+          </label>
         </div>
       } @empty {
         <div class="catalog-empty">По этому фильтру мероприятий нет</div>

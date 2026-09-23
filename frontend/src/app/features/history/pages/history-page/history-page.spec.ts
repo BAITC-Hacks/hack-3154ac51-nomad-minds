@@ -56,7 +56,7 @@ describe('HistoryPage', () => {
     expect(text).toContain(SAVED_SCENARIO.name);
     expect(text).toContain('56.5');
     expect(text).toContain('23.09.2026');
-    expect(text).toContain('95 / 100');
+    expect(text).toContain('95 / 100 млн');
   });
 
   it('shows load errors and lets the user retry', async () => {

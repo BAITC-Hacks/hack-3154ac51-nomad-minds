@@ -9,7 +9,7 @@
   min-height: 72px;
   padding: 0 24px;
   display: grid;
-  grid-template-columns: minmax(290px, 0.9fr) auto minmax(260px, 0.65fr) auto auto;
+  grid-template-columns: minmax(290px, 1fr) auto minmax(300px, 0.8fr) auto;
   align-items: center;
   gap: 16px;
   background: #fff;
@@ -172,25 +172,9 @@ nav a.active {
   line-height: 1;
 }
 
-.header-actions {
-  justify-self: end;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.user {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-left: 6px;
-  color: #344e70;
-  font-size: 16px;
-}
-
 @media (max-width: 1280px) {
   .app-header {
-    grid-template-columns: minmax(290px, 1fr) minmax(210px, 0.7fr) auto auto;
+    grid-template-columns: minmax(290px, 1fr) minmax(300px, 0.8fr) auto;
     padding-top: 10px;
     padding-bottom: 10px;
   }
@@ -215,28 +199,20 @@ nav a.active {
     grid-row: 2;
   }
 
+  .brand { grid-column: 1 / -1; }
+
   .header-clock {
     grid-column: 2;
     grid-row: 2;
   }
 
-  .header-actions {
-    grid-column: 2;
-    grid-row: 1;
-  }
   nav { grid-row: 3; }
-}
-
-@media (max-width: 960px) {
-  .user { display: none; }
 }
 
 @media (max-width: 720px) {
   .brand strong { font-size: 22px; }
   .brand small { display: none; }
   .brand-mark { width: 42px; }
-  .user span,
-  .user nz-icon { display: none; }
 }
 
 @media (max-width: 560px) {
@@ -249,11 +225,6 @@ nav a.active {
   .brand strong { font-size: 20px; }
   .brand-mark { width: 32px; height: 38px; gap: 2px; }
   .brand-mark span { width: 5px; }
-  .header-actions { gap: 6px; }
-
-  .user {
-    display: none;
-  }
 
   .header-budget {
     padding: 6px 8px 4px;

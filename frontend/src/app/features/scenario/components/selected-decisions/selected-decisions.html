@@ -26,7 +26,7 @@
           [nzColor]="direction.softColor"
           [style.--direction-color]="direction.color"
         >{{ direction.label }}</nz-tag>
-        <b>{{ measure.cost }}</b>
+        <b>{{ measure.cost }} млн</b>
         <button
           class="remove-button"
           type="button"
@@ -42,7 +42,7 @@
         <nz-icon nzType="inbox" />
         <span>Выберите {{ store.maxDecisions() }} инициатив из каталога</span>
         <button nz-button nzSize="small" type="button" [disabled]="store.isSaving() || store.isCalculating() || store.isAnalyzing()" (click)="store.restoreDemo()">
-          Вернуть демо-набор
+          Загрузить демо-набор
         </button>
       </div>
     }
@@ -61,7 +61,7 @@
         Соберите {{ store.maxDecisions() }} решений
       }
     </strong>
-    <span>Бюджет: {{ store.spentBudget() }} / {{ store.totalBudget() }}</span>
+    <span>Бюджет: {{ store.spentBudget() }} / {{ store.totalBudget() }} млн</span>
     <span>Направлений: {{ store.coverageCount() }} / {{ store.directionMeta.length }}</span>
   </div>
   @if (store.validationErrors().length) {

@@ -6,6 +6,7 @@
   [attr.role]="isFullscreen() ? 'dialog' : null"
   [attr.aria-modal]="isFullscreen() ? 'true' : null"
   aria-labelledby="city-map-title"
+  (mouseleave)="hideDistrictTooltip()"
 >
   <div class="panel-heading map-heading">
     <div class="map-title">
@@ -67,4 +68,24 @@
     </div>
     <p>Нажмите на район, чтобы выбрать его для новой меры. <span>* Сарайшык — пока нет данных для расчёта.</span></p>
   </div>
+  @if (hoveredDistrict(); as district) {
+    <div
+      id="district-map-tooltip"
+      class="district-tooltip"
+      role="tooltip"
+      [style.left.px]="tooltipPosition().x"
+      [style.top.px]="tooltipPosition().y"
+    >
+      <strong><span [style.background]="district.color"></span>{{ district.name }}</strong>
+      @if (district.data; as data) {
+        <p>{{ data.profile }}</p>
+        <dl>
+          <div><dt>Доля населения</dt><dd>{{ data.populationShare * 100 | number: '1.0-0' }}%</dd></div>
+          <div><dt>Индекс района D</dt><dd>{{ (district.score | number: '1.1-1') ?? '—' }}</dd></div>
+        </dl>
+      } @else {
+        <p>Пока нет данных для расчёта мер.</p>
+      }
+    </div>
+  }
 </section>

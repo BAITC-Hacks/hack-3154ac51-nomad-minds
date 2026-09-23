@@ -1,10 +1,10 @@
 <header class="app-header">
-  <a class="brand" routerLink="/scenario" aria-label="Аким на 5 часов — главная">
+  <a class="brand" routerLink="/scenario" aria-label="SmartAkim — главная">
     <span class="brand-mark" aria-hidden="true">
       <span></span><span></span><span></span><span></span><span></span>
     </span>
     <span>
-      <strong>Аким на 5 часов</strong>
+      <strong>SmartAkim</strong>
       <small>AI-симулятор управления городом</small>
     </span>
   </a>
@@ -16,12 +16,12 @@
 
   <section
     class="header-budget"
-    [attr.aria-label]="'Бюджет: использовано ' + store.spentBudget() + ' из ' + store.totalBudget()"
+    [attr.aria-label]="'Бюджет: использовано ' + store.spentBudget() + ' млн из ' + store.totalBudget() + ' млн'"
   >
     <div class="budget-copy">
       <span>Бюджет</span>
-      <strong>{{ store.spentBudget() }} / {{ store.totalBudget() }}</strong>
-      <small>Осталось {{ store.remainingBudget() }}</small>
+      <strong>{{ store.spentBudget() }} / {{ store.totalBudget() }} млн</strong>
+      <small>Осталось {{ store.remainingBudget() }} млн</small>
     </div>
     <nz-progress
       [nzPercent]="store.budgetUsagePercent()"
@@ -34,12 +34,4 @@
     <small>{{ currentDate() }}</small>
     <strong>{{ currentTime() }}</strong>
   </time>
-
-  <div class="header-actions">
-    <span class="user">
-      <nz-avatar nzIcon="user"></nz-avatar>
-      <span>Участник</span>
-      <nz-icon nzType="down" />
-    </span>
-  </div>
 </header>

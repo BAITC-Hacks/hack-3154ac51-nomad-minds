@@ -10,7 +10,7 @@ import {
   inject,
   signal,
 } from '@angular/core';
-import { DOCUMENT } from '@angular/common';
+import { DecimalPipe, DOCUMENT } from '@angular/common';
 import { CdkTrapFocus } from '@angular/cdk/a11y';
 import { NzIconModule } from 'ng-zorro-antd/icon';
 import * as L from 'leaflet';
@@ -25,7 +25,7 @@ interface DistrictGeometryProperties {
 
 @Component({
   selector: 'app-city-map',
-  imports: [NzIconModule, CdkTrapFocus],
+  imports: [DecimalPipe, NzIconModule, CdkTrapFocus],
   templateUrl: './city-map.html',
   styleUrl: './city-map.scss',
 })
@@ -42,6 +42,18 @@ export class CityMap implements AfterViewInit, OnDestroy {
   protected readonly isFullscreen = signal(false);
   protected readonly loading = signal(true);
   protected readonly loadError = signal(false);
+  private readonly hoveredDistrictId = signal<string | null>(null);
+  protected readonly tooltipPosition = signal({ x: 0, y: 0 });
+  protected readonly hoveredDistrict = computed(() => {
+    const id = this.hoveredDistrictId();
+    const district = this.mapDistricts().find((item) => item.id === id);
+    if (!district) return null;
+    return {
+      ...district,
+      data: this.store.districtById(district.id),
+      score: this.store.baselineResult()?.districts.find((item) => item.districtId === id)?.before,
+    };
+  });
   protected readonly mapDistricts = computed(() => [
     ...this.store.districts().map(({ id, name, color }) => ({ id, name, color, available: true })),
     ...(!this.store.districtById('sarayshyk')
@@ -114,13 +126,18 @@ export class CityMap implements AfterViewInit, OnDestroy {
         }).addTo(this.map!);
         bounds.extend(polygon.getBounds());
         this.polygonLayers.set(district.id, polygon);
+        polygon.on({
+          mouseover: (event: L.LeafletMouseEvent) => this.showDistrictTooltip(district.id, event.originalEvent),
+          mousemove: (event: L.LeafletMouseEvent) => this.positionTooltip(event.originalEvent.clientX, event.originalEvent.clientY),
+          mouseout: () => this.hideDistrictTooltip(),
+        });
         if (district.available) {
           polygon.on('click', () => this.store.selectDistrict(district.id));
         } else {
           polygon.bindPopup('Сарайшык: в текущем сценарии пока нет данных для расчёта мер.');
         }
         const [longitude, latitude] = feature.properties.label;
-        L.tooltip({
+        const label = L.tooltip({
           permanent: true,
           direction: 'center',
           className: 'district-map-label',
@@ -129,7 +146,31 @@ export class CityMap implements AfterViewInit, OnDestroy {
           .setLatLng([latitude, longitude])
           .setContent(district.name)
           .addTo(this.map!)
-          .on('click', () => this.selectDistrict(district.id));
+          .on({
+            click: () => this.selectDistrict(district.id),
+            mouseover: (event: L.LeafletMouseEvent) => this.showDistrictTooltip(district.id, event.originalEvent),
+            mousemove: (event: L.LeafletMouseEvent) => this.positionTooltip(event.originalEvent.clientX, event.originalEvent.clientY),
+            mouseout: () => this.hideDistrictTooltip(),
+          });
+        const element = label.getElement();
+        if (element) {
+          element.tabIndex = 0;
+          element.setAttribute('role', 'button');
+          element.setAttribute('aria-label', `Район ${district.name}: сведения и выбор`);
+          element.setAttribute('aria-describedby', 'district-map-tooltip');
+          element.addEventListener('focus', () => {
+            const rect = element.getBoundingClientRect();
+            this.hoveredDistrictId.set(district.id);
+            this.positionTooltip(rect.right, rect.bottom);
+          });
+          element.addEventListener('blur', () => this.hideDistrictTooltip());
+          element.addEventListener('keydown', (event) => {
+            if (event.key === 'Enter' || event.key === ' ') {
+              event.preventDefault();
+              this.selectDistrict(district.id);
+            }
+          });
+        }
       }
       this.bounds = bounds;
       this.showCity();
@@ -149,6 +190,7 @@ export class CityMap implements AfterViewInit, OnDestroy {
   }
 
   protected showCity(): void {
+    this.hideDistrictTooltip();
     if (this.bounds && this.map) {
       this.map.fitBounds(this.bounds, { padding: [24, 24], animate: false });
     }
@@ -185,6 +227,7 @@ export class CityMap implements AfterViewInit, OnDestroy {
 
   @HostListener('document:keydown.escape', ['$event'])
   protected onEscape(event: Event): void {
+    this.hideDistrictTooltip();
     if (this.isFullscreen() && !this.document.fullscreenElement) {
       event.preventDefault();
       this.setExpanded(false);
@@ -202,7 +245,28 @@ export class CityMap implements AfterViewInit, OnDestroy {
       this.map?.scrollWheelZoom.disable();
     }
     this.isFullscreen.set(expanded);
+    this.hideDistrictTooltip();
     this.fullscreenButton.nativeElement.focus();
+  }
+
+  protected hideDistrictTooltip(): void {
+    this.hoveredDistrictId.set(null);
+  }
+
+  private showDistrictTooltip(id: string, event: MouseEvent): void {
+    this.hoveredDistrictId.set(id);
+    this.positionTooltip(event.clientX, event.clientY);
+  }
+
+  private positionTooltip(clientX: number, clientY: number): void {
+    const viewport = this.document.documentElement;
+    const width = Math.min(248, viewport.clientWidth - 24);
+    const x = clientX + width + 16 > viewport.clientWidth
+      ? clientX - width - 12 : clientX + 12;
+    this.tooltipPosition.set({
+      x: Math.max(12, Math.min(x, viewport.clientWidth - width - 12)),
+      y: Math.max(12, Math.min(clientY + 12, viewport.clientHeight - 210)),
+    });
   }
 
   private districtStyle(id: string, selectedId: string): L.PathOptions {

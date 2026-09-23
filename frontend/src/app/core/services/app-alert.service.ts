@@ -1,6 +1,6 @@
 import { DestroyRef, Injectable, inject, signal } from '@angular/core';
 
-export type AppAlertType = 'success' | 'info' | 'warning' | 'error';
+export type AppAlertType = 'warning' | 'error';
 
 export interface AppAlert {
   id: number;
@@ -11,8 +11,6 @@ export interface AppAlert {
 }
 
 const TITLES: Record<AppAlertType, string> = {
-  success: 'Готово',
-  info: 'Информация',
   warning: 'Обратите внимание',
   error: 'Не удалось выполнить действие',
 };

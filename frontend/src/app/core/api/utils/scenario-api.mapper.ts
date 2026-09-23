@@ -136,7 +136,7 @@ export function translateValidationError(message: string): string {
     return `Мероприятие ${match[1]} действует на весь город; район указывать не нужно.`;
   }
   if ((match = message.match(/^Budget exceeded: (.+) of (.+)\.$/))) {
-    return `Превышен бюджет: ${match[1]} из ${match[2]}.`;
+    return `Превышен бюджет: ${match[1]} млн из ${match[2]} млн.`;
   }
   if ((match = message.match(/^At most (\d+) measures are allowed in (\w+)\.$/))) {
     const direction = DIRECTION_META.find((item) => item.id === match![2]);
@@ -204,7 +204,7 @@ function translateFallback(message: string): string {
     return `Показателей ниже критического порога: ${match[1]}.`;
   }
   if ((match = message.match(/^Budget spent: (.+) of (.+)\.$/))) {
-    return `Использовано ${match[1]} из ${match[2]} единиц бюджета.`;
+    return `Использовано ${match[1]} млн из ${match[2]} млн бюджета.`;
   }
   if (message === 'No positive direction changes were recorded.') {
     return 'Положительных изменений по направлениям не зафиксировано.';

@@ -48,13 +48,20 @@ describe('Scenario results navigation', () => {
   function loadDataset(): void {
     http.expectOne('/api/v1/dataset').flush(DATASET_FIXTURE);
     http.expectOne('/api/v1/health').flush({ status: 'ok', aiProvider: 'fallback' });
-    http.expectOne('/api/v1/scenarios/validate').flush(COMPLETE);
+    const validation = http.expectOne('/api/v1/scenarios/validate');
+    expect(validation.request.body).toEqual({ decisions: [] });
+    validation.flush({
+      ...COMPLETE, complete: false,
+      budget: { total: 100, spent: 0, remaining: 100 },
+    });
   }
 
   it.each(['success', 'failure'])('keeps the edited scenario when returning after calculation %s', async (outcome) => {
     const harness = await RouterTestingHarness.create('/scenario');
     const store = TestBed.inject(ScenarioStoreService);
     loadDataset();
+    store.restoreDemo();
+    http.expectOne('/api/v1/scenarios/validate').flush(COMPLETE);
     store.setScenarioName('Мой изменённый сценарий');
     store.selectDistrict('esil');
     store.setDirection('transport');

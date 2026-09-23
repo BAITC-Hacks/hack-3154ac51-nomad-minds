@@ -1,15 +1,11 @@
 import { Component, computed, DestroyRef, inject, signal } from '@angular/core';
 import { RouterLink, RouterLinkActive } from '@angular/router';
-import { NzAvatarModule } from 'ng-zorro-antd/avatar';
-import { NzIconModule } from 'ng-zorro-antd/icon';
 import { NzProgressModule } from 'ng-zorro-antd/progress';
 import { ScenarioStoreService } from '../../services/scenario-store.service';
 
 @Component({
   selector: 'app-header',
   imports: [
-    NzAvatarModule,
-    NzIconModule,
     NzProgressModule,
     RouterLink,
     RouterLinkActive,

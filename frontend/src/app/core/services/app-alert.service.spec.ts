@@ -15,18 +15,16 @@ describe('AppAlertService', () => {
   });
 
   it('dismisses every alert type exactly five seconds after it appears', () => {
-    alerts.notify('success', 'Сценарий сохранён.');
-    alerts.notify('info', 'Выбран район Нура.');
     alerts.notify('warning', 'Бюджет превышен.');
     alerts.notify('error', 'Сервер недоступен.');
     vi.advanceTimersByTime(4999);
-    expect(alerts.alerts().map((alert) => alert.type)).toEqual(['error', 'warning', 'info', 'success']);
+    expect(alerts.alerts().map((alert) => alert.type)).toEqual(['error', 'warning']);
     vi.advanceTimersByTime(1);
     expect(alerts.alerts()).toEqual([]);
   });
 
   it('allows an alert to be closed before its timeout and cancels its timer', () => {
-    const id = alerts.notify('info', 'Выбран район Нура.');
+    const id = alerts.notify('warning', 'Бюджет превышен.');
     vi.advanceTimersByTime(3000);
     alerts.dismiss(id);
     expect(alerts.alerts()).toEqual([]);
@@ -34,7 +32,7 @@ describe('AppAlertService', () => {
   });
 
   it('replaces an operation alert without its old timer dismissing the replacement', () => {
-    alerts.notify('info', 'Проверка.', { key: 'validation' });
+    alerts.notify('error', 'Не удалось проверить сценарий.', { key: 'validation' });
     vi.advanceTimersByTime(3000);
     alerts.notify('warning', 'Не хватает бюджета.', { key: 'validation' });
     vi.advanceTimersByTime(2000);

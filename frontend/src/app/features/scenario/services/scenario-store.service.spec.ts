@@ -9,6 +9,9 @@ import { ScenarioStoreService } from './scenario-store.service';
 const COMPLETE: ValidationResponse = {
   valid: true, complete: true, validationErrors: [], budget: { total: 100, spent: 95, remaining: 5 },
 };
+const EMPTY: ValidationResponse = {
+  valid: true, complete: false, validationErrors: [], budget: { total: 100, spent: 0, remaining: 100 },
+};
 const SAVED: SavedScenario = {
   id: 'server-id', name: 'Мой сценарий', datasetVersion: DATASET_FIXTURE.datasetVersion,
   decisions: REFERENCE_DECISIONS, result: CALCULATION_FIXTURE, createdAt: '2026-09-23 12:00:00',
@@ -35,7 +38,19 @@ describe('ScenarioStoreService API workflow', () => {
   function load(): void {
     http.expectOne('/api/v1/dataset').flush(DATASET_FIXTURE);
     http.expectOne('/api/v1/health').flush({ status: 'ok', aiProvider: 'fallback' });
+    const validation = http.expectOne('/api/v1/scenarios/validate');
+    expect(validation.request.body).toEqual({ decisions: [] });
+    validation.flush(EMPTY);
+  }
+
+  function restoreDemo(): void {
+    store.restoreDemo();
     http.expectOne('/api/v1/scenarios/validate').flush(COMPLETE);
+  }
+
+  function loadDemo(): void {
+    load();
+    restoreDemo();
   }
 
   function calculate(): void {
@@ -45,7 +60,7 @@ describe('ScenarioStoreService API workflow', () => {
     request.flush(CALCULATION_FIXTURE);
   }
 
-  it('loads API data and validates but never presents a local calculation as a server result', () => {
+  it('starts with no selected measures and loads a demo only when requested', () => {
     expect(store.isLoading()).toBe(true);
     expect(store.districts()).toEqual([]);
     load();
@@ -53,12 +68,21 @@ describe('ScenarioStoreService API workflow', () => {
     expect(store.districts()[0].populationShare).toBe(0.27);
     expect(store.measures().length).toBe(DATASET_FIXTURE.measures.length);
     expect(store.totalBudget()).toBe(100);
+    expect(store.decisions()).toEqual([]);
+    expect(store.spentBudget()).toBe(0);
+    expect(store.remainingBudget()).toBe(100);
+    expect(store.canCalculate()).toBe(false);
+    expect(store.canSave()).toBe(false);
+    expect(store.result()).toBeNull();
+    expect(alerts.alerts()).toEqual([]);
+    restoreDemo();
     expect(store.canCalculate()).toBe(true);
+    expect(store.decisions()).toEqual(REFERENCE_DECISIONS);
     expect(store.result()).toBeNull();
     expect(alerts.alerts()).toEqual([]);
     calculate();
     expect(store.result()?.score).toBe(CALCULATION_FIXTURE.score);
-    expect(alerts.alerts().find((alert) => alert.key === 'scenario.calculation')?.type).toBe('success');
+    expect(alerts.alerts()).toEqual([]);
   });
 
   it('recovers from dataset connection failure and keeps all scenario actions disabled meanwhile', () => {
@@ -80,7 +104,7 @@ describe('ScenarioStoreService API workflow', () => {
   });
 
   it('cancels stale validation and calculation when the selection changes', () => {
-    load();
+    loadDemo();
     store.calculateScenario();
     const calculation = http.expectOne('/api/v1/scenarios/calculate');
     store.removeDecision('M5');
@@ -92,11 +116,11 @@ describe('ScenarioStoreService API workflow', () => {
     http.expectOne('/api/v1/scenarios/validate').flush({ ...COMPLETE, complete: false });
     expect(store.result()).toBeNull();
     expect(store.canCalculate()).toBe(false);
-    expect(alerts.alerts().some((alert) => alert.type === 'error')).toBe(false);
+    expect(alerts.alerts()).toEqual([]);
   });
 
   it('recovers from validation failure without changing the selected decisions', () => {
-    load();
+    loadDemo();
     store.validateScenario();
     http.expectOne('/api/v1/scenarios/validate').flush({}, { status: 503, statusText: 'Unavailable' });
     expect(store.canCalculate()).toBe(false);
@@ -110,7 +134,7 @@ describe('ScenarioStoreService API workflow', () => {
   });
 
   it('sends the exact complete server result to analysis and discards stale analysis', () => {
-    load();
+    loadDemo();
     calculate();
     store.analyzeScenario();
     const analysis = http.expectOne('/api/v1/scenarios/analyze');
@@ -119,14 +143,12 @@ describe('ScenarioStoreService API workflow', () => {
     expect(analysis.cancelled).toBe(true);
     expect(store.isAnalyzing()).toBe(false);
     expect(store.analysis()).toBeNull();
-    expect(alerts.alerts().some((alert) => alert.type === 'error')).toBe(false);
+    expect(alerts.alerts()).toEqual([]);
     http.expectOne('/api/v1/scenarios/validate').flush({ ...COMPLETE, complete: false });
   });
 
   it('does not save incomplete scenarios, prevents duplicate submissions and uses the server snapshot', () => {
     load();
-    store.reset();
-    http.expectOne('/api/v1/scenarios/validate').flush({ ...COMPLETE, complete: false });
     store.saveScenario();
     http.expectNone('/api/v1/scenarios');
     store.restoreDemo();
@@ -145,10 +167,11 @@ describe('ScenarioStoreService API workflow', () => {
     expect(store.isSaved()).toBe(true);
     store.setScenarioName('Другое название');
     expect(store.isSaved()).toBe(false);
+    expect(alerts.alerts()).toEqual([]);
   });
 
   it('keeps a failed save retryable and never shows it as saved', () => {
-    load();
+    loadDemo();
     store.saveScenario();
     http.expectOne('/api/v1/scenarios').flush({}, { status: 500, statusText: 'Error' });
     expect(store.isSaving()).toBe(false);
@@ -162,7 +185,7 @@ describe('ScenarioStoreService API workflow', () => {
   });
 
   it('does not overwrite the opened snapshot metadata with an older pending save', () => {
-    load();
+    loadDemo();
     store.saveScenario();
     const save = http.expectOne('/api/v1/scenarios');
     const opened = { ...SAVED, id: 'other-id', name: 'Сохранённый сценарий', createdAt: '2026-09-22T10:00:00Z' };
@@ -175,7 +198,7 @@ describe('ScenarioStoreService API workflow', () => {
   });
 
   it('retains a newly saved scenario when an earlier history request returns', () => {
-    load();
+    loadDemo();
     store.loadHistory();
     const history = http.expectOne('/api/v1/scenarios');
     store.saveScenario();
@@ -199,11 +222,11 @@ describe('ScenarioStoreService API workflow', () => {
     expect(store.decisions()).toEqual(REFERENCE_DECISIONS);
     expect(store.isSaved()).toBe(true);
     expect(store.historyError()).toBeNull();
-    expect(alerts.alerts().find((alert) => alert.key === 'scenario.open')?.type).toBe('success');
+    expect(alerts.alerts()).toEqual([]);
   });
 
   it('rejects a business-invalid calculation even when it arrives with HTTP 200', () => {
-    load();
+    loadDemo();
     store.calculateScenario();
     http.expectOne('/api/v1/scenarios/calculate').flush({
       valid: false, datasetVersion: '1.0.0', budget: COMPLETE.budget,
@@ -217,17 +240,15 @@ describe('ScenarioStoreService API workflow', () => {
     });
   });
 
-  it('announces district changes and scenario edits while avoiding duplicate selections', () => {
-    load();
+  it('keeps district changes and scenario edits silent while warning about duplicate selections', () => {
+    loadDemo();
     store.selectDistrict(store.selectedDistrictId());
     expect(alerts.alerts()).toEqual([]);
     store.selectDistrict('esil');
-    expect(alerts.alerts().find((alert) => alert.key === 'scenario.district')).toMatchObject({
-      type: 'info', message: expect.stringContaining(store.selectedDistrict()!.name),
-    });
-    const districtAlertId = alerts.alerts().find((alert) => alert.key === 'scenario.district')?.id;
+    expect(store.selectedDistrictId()).toBe('esil');
+    expect(alerts.alerts()).toEqual([]);
     store.selectDistrict('esil');
-    expect(alerts.alerts().find((alert) => alert.key === 'scenario.district')?.id).toBe(districtAlertId);
+    expect(alerts.alerts()).toEqual([]);
 
     store.addMeasure('M5');
     expect(alerts.alerts().find((alert) => alert.key === 'scenario.addition')).toMatchObject({
@@ -239,22 +260,17 @@ describe('ScenarioStoreService API workflow', () => {
     http.expectOne('/api/v1/scenarios/validate').flush({
       ...COMPLETE, complete: false, budget: { total: 100, spent, remaining: 100 - spent },
     });
-    expect(alerts.alerts().find((alert) => alert.key === 'scenario.selection')?.type).toBe('info');
-    expect(alerts.alerts().find((alert) => alert.key === 'scenario.addition')).toBeUndefined();
+    expect(alerts.alerts()).toEqual([]);
     store.addMeasure('M5');
     http.expectOne('/api/v1/scenarios/validate').flush(COMPLETE);
-    expect(alerts.alerts().find((alert) => alert.key === 'scenario.addition')?.type).toBe('success');
+    expect(alerts.alerts()).toEqual([]);
 
     store.reset();
     http.expectOne('/api/v1/scenarios/validate').flush({ ...COMPLETE, complete: false });
-    expect(alerts.alerts().find((alert) => alert.key === 'scenario.selection')).toMatchObject({
-      type: 'info', message: expect.stringContaining('очищен'),
-    });
+    expect(alerts.alerts()).toEqual([]);
     store.restoreDemo();
     http.expectOne('/api/v1/scenarios/validate').flush(COMPLETE);
-    expect(alerts.alerts().find((alert) => alert.key === 'scenario.selection')).toMatchObject({
-      type: 'success', message: expect.stringContaining('восстановлен'),
-    });
+    expect(alerts.alerts()).toEqual([]);
   });
 
   it('presents backend validation warnings and clears them after a successful recheck', () => {
@@ -272,15 +288,15 @@ describe('ScenarioStoreService API workflow', () => {
     expect(alerts.alerts().find((alert) => alert.key === 'scenario.validation')).toBeUndefined();
   });
 
-  it('preserves server error messages and replaces them with successful operation feedback', () => {
-    load();
+  it('preserves server error messages and clears them silently after a successful retry', () => {
+    loadDemo();
     store.calculateScenario();
     http.expectOne('/api/v1/scenarios/calculate').flush({ detail: 'Расчёт временно недоступен.' }, { status: 409, statusText: 'Conflict' });
     expect(alerts.alerts().find((alert) => alert.key === 'scenario.calculation')).toMatchObject({
       type: 'error', message: 'Расчёт временно недоступен.',
     });
     calculate();
-    expect(alerts.alerts().filter((alert) => alert.key === 'scenario.calculation')).toMatchObject([{ type: 'success' }]);
+    expect(alerts.alerts()).toEqual([]);
 
     store.analyzeScenario();
     http.expectOne('/api/v1/scenarios/analyze').flush({ detail: 'Сервис анализа занят.' }, { status: 409, statusText: 'Conflict' });
@@ -289,7 +305,7 @@ describe('ScenarioStoreService API workflow', () => {
     });
     store.analyzeScenario();
     http.expectOne('/api/v1/scenarios/analyze').flush(ANALYSIS);
-    expect(alerts.alerts().filter((alert) => alert.key === 'scenario.analysis')).toMatchObject([{ type: 'success' }]);
+    expect(alerts.alerts()).toEqual([]);
 
     store.saveScenario();
     http.expectOne('/api/v1/scenarios').flush({ detail: 'Хранилище недоступно.' }, { status: 409, statusText: 'Conflict' });
@@ -298,18 +314,17 @@ describe('ScenarioStoreService API workflow', () => {
     });
     store.saveScenario();
     http.expectOne('/api/v1/scenarios').flush(SAVED);
-    expect(alerts.alerts().filter((alert) => alert.key === 'scenario.save')).toMatchObject([{ type: 'success' }]);
+    expect(alerts.alerts()).toEqual([]);
   });
 
-  it('warns when analysis uses the fallback while retaining the returned analysis', () => {
-    load();
+  it('retains fallback analysis without displaying an alert', () => {
+    loadDemo();
     calculate();
     store.analyzeScenario();
     http.expectOne('/api/v1/scenarios/analyze').flush({ ...ANALYSIS, source: 'fallback', model: null });
     expect(store.analysis()?.source).toBe('fallback');
-    expect(alerts.alerts().find((alert) => alert.key === 'scenario.analysis')).toMatchObject({
-      type: 'warning', message: expect.stringContaining('базовый анализ'),
-    });
+    expect(store.analysis()?.summary).toBe(ANALYSIS.summary);
+    expect(alerts.alerts()).toEqual([]);
   });
 
   it('reports history errors and clears the alert when a retry succeeds without a success notification', () => {
