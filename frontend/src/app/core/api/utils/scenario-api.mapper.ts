@@ -154,7 +154,7 @@ export function translateValidationError(message: string): string {
   if (message === 'Only a valid calculated scenario can be analyzed.') {
     return 'Сначала рассчитайте корректный сценарий, затем запустите анализ.';
   }
-  return 'Не удалось проверить сценарий. Проверьте выбранные мероприятия и районы.';
+  return message;
 }
 
 export function toUserMessage(error: unknown, fallback: string): string {
@@ -162,9 +162,9 @@ export function toUserMessage(error: unknown, fallback: string): string {
   if (error.status === 0) return 'Нет соединения с сервером. Проверьте, что бэкенд запущен, и повторите попытку.';
   if (error.status >= 500) return fallback;
   const body: unknown = error.error;
-  if (typeof body !== 'object' || body === null || !('detail' in body)) return fallback;
-  const detail = body.detail;
-  if (typeof detail === 'string') return translateValidationError(detail);
+  if (typeof body !== 'object' || body === null) return fallback;
+  const detail = 'detail' in body ? body.detail : 'message' in body ? body.message : null;
+  if (typeof detail === 'string') return detail.trim() ? translateValidationError(detail) : fallback;
   if (Array.isArray(detail) && detail.every((item): item is string => typeof item === 'string')) {
     return detail.length ? detail.map(translateValidationError).join(' ') : fallback;
   }

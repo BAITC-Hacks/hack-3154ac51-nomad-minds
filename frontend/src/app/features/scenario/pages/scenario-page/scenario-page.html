@@ -8,17 +8,16 @@
       <button nz-button type="button" [disabled]="store.isLoading()" (click)="store.loadDataset()">Повторить загрузку</button>
     </div>
   }
-  @if (store.message(); as message) {
-    <div class="scenario-message" role="status"><nz-alert nzType="info" nzShowIcon [nzMessage]="message" /></div>
-  }
   @if (store.hasDataset()) {
-  <section class="workspace-row workspace-districts" aria-label="Районы и карта города">
+  <section class="workspace-row workspace-planning" aria-label="Районы города и планирование решений">
     <app-district-list />
-    <app-city-map />
+    <div class="workspace-decisions">
+      <app-measure-catalog />
+      <app-selected-decisions />
+    </div>
   </section>
-  <section class="workspace-row workspace-decisions" aria-label="Каталог и выбранные решения">
-    <app-measure-catalog />
-    <app-selected-decisions />
+  <section class="workspace-row workspace-map" aria-label="Карта районов города">
+    <app-city-map />
   </section>
   <section class="workspace-row workspace-results" aria-label="Результаты и AI-анализ сценария">
     <app-scenario-results />

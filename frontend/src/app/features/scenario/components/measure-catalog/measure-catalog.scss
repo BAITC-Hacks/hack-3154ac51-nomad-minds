@@ -1,4 +1,8 @@
-:host { display: block; min-width: 0; }
+:host {
+  display: block;
+  min-width: 0;
+  container: catalog / inline-size;
+}
 
 .catalog-panel {
   min-height: 384px;
@@ -103,7 +107,7 @@
   text-overflow: ellipsis;
 }
 
-@media (max-width: 680px) {
+@container catalog (max-width: 680px) {
   .catalog-heading { align-items: stretch; flex-direction: column; }
   .catalog-heading nz-input-group { width: 100%; }
   .catalog-row {

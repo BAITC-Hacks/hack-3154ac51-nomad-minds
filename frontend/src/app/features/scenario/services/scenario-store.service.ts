@@ -12,6 +12,7 @@ import {
 } from '../../../core/api/utils/scenario-api.mapper';
 import { DIRECTION_META } from '../../../core/api/models/city-presentation';
 import { Decision, Direction } from '../../../core/models/city.models';
+import { AppAlertService } from '../../../core/services/app-alert.service';
 
 const INITIAL_DECISIONS: Decision[] = [
   { measureId: 'M7', districtId: 'nura' },
@@ -24,6 +25,7 @@ const INITIAL_DECISIONS: Decision[] = [
 @Injectable({ providedIn: 'root' })
 export class ScenarioStoreService {
   private readonly api = inject(ScenarioApiService);
+  private readonly alerts = inject(AppAlertService);
   private readonly destroyRef = inject(DestroyRef);
   private readonly dataset = signal<DatasetResponse | null>(null);
   private readonly validation = signal<ValidationResponse | null>(null);
@@ -115,7 +117,9 @@ export class ScenarioStoreService {
     this.validationRequests.pipe(
       switchMap((decisions) => this.api.validateScenario(decisions).pipe(
         catchError((error: unknown) => {
-          this.validationErrors.set([toUserMessage(error, 'Не удалось проверить сценарий. Повторите проверку.')]);
+          const message = toUserMessage(error, 'Не удалось проверить сценарий. Повторите проверку.');
+          this.validationErrors.set([message]);
+          this.notify('error', message, 'scenario.validation');
           return of(null);
         }),
       )),
@@ -123,7 +127,14 @@ export class ScenarioStoreService {
     ).subscribe((validation) => {
       this.validation.set(validation);
       this.isValidating.set(false);
-      if (validation) this.validationErrors.set(validation.validationErrors.map(translateValidationError));
+      if (validation) {
+        const errors = validation.validationErrors.map(translateValidationError);
+        this.validationErrors.set(errors);
+        this.alerts.clear('scenario.validation');
+        if (errors.length || !validation.valid) {
+          this.notify('warning', errors.join(' ') || 'Проверьте выбранные мероприятия перед расчётом.', 'scenario.validation');
+        }
+      }
     });
     this.loadDataset();
   }
@@ -140,6 +151,7 @@ export class ScenarioStoreService {
       takeUntilDestroyed(this.destroyRef),
     ).subscribe({
       next: ({ dataset, health }) => {
+        this.alerts.clear('scenario.dataset');
         const firstLoad = !this.hasDataset();
         this.dataset.set(dataset);
         this.health.set(health);
@@ -154,7 +166,9 @@ export class ScenarioStoreService {
       },
       error: (error: unknown) => {
         this.health.set(null);
-        this.loadError.set(toUserMessage(error, 'Не удалось загрузить данные города. Проверьте подключение к серверу.'));
+        const message = toUserMessage(error, 'Не удалось загрузить данные города. Проверьте подключение к серверу.');
+        this.loadError.set(message);
+        this.notify('error', message, 'scenario.dataset');
       },
     });
   }
@@ -173,6 +187,7 @@ export class ScenarioStoreService {
     this.analysisRequest?.unsubscribe();
     this.serverResult.set(null);
     this.analysis.set(null);
+    this.alerts.clear('scenario.analysis');
     this.message.set(null);
     this.isCalculating.set(true);
     this.calculationRequest = this.api.calculateScenario(this.decisions()).pipe(
@@ -181,14 +196,16 @@ export class ScenarioStoreService {
     ).subscribe({
       next: (result) => {
         if (!result.valid) {
-          this.validationErrors.set(result.validationErrors.map(translateValidationError));
+          const errors = result.validationErrors.map(translateValidationError);
+          this.validationErrors.set(errors);
           this.validation.set(null);
+          this.notify('warning', errors.join(' ') || 'Сценарий не прошёл проверку. Измените выбранные мероприятия.', 'scenario.calculation');
           return;
         }
         this.serverResult.set(result);
-        this.message.set('Сценарий рассчитан. Можно запросить AI-анализ или сохранить результат.');
+        this.notify('success', 'Сценарий рассчитан. Можно запросить AI-анализ или сохранить результат.', 'scenario.calculation');
       },
-      error: (error: unknown) => this.message.set(toUserMessage(error, 'Не удалось рассчитать сценарий. Попробуйте ещё раз.')),
+      error: (error: unknown) => this.notify('error', toUserMessage(error, 'Не удалось рассчитать сценарий. Попробуйте ещё раз.'), 'scenario.calculation'),
     });
   }
 
@@ -201,8 +218,15 @@ export class ScenarioStoreService {
       finalize(() => this.isAnalyzing.set(false)),
       takeUntilDestroyed(this.destroyRef),
     ).subscribe({
-      next: (analysis) => this.analysis.set(mapAnalysis(analysis)),
-      error: (error: unknown) => this.message.set(toUserMessage(error, 'Не удалось получить AI-анализ. Попробуйте ещё раз.')),
+      next: (analysis) => {
+        this.analysis.set(mapAnalysis(analysis));
+        if (analysis.source === 'fallback') {
+          this.notify('warning', 'AI-анализ недоступен. Подготовлен базовый анализ по рассчитанным показателям.', 'scenario.analysis');
+        } else {
+          this.notify('success', 'AI-анализ готов. Ознакомьтесь с выводами и рекомендациями.', 'scenario.analysis');
+        }
+      },
+      error: (error: unknown) => this.notify('error', toUserMessage(error, 'Не удалось получить AI-анализ. Попробуйте ещё раз.'), 'scenario.analysis'),
     });
   }
 
@@ -225,9 +249,9 @@ export class ScenarioStoreService {
           this.savedAt.set(saved.createdAt);
           this.serverResult.set(saved.result);
         }
-        this.message.set(`Сценарий «${saved.name}» сохранён на сервере и доступен в истории результатов.`);
+        this.notify('success', `Сценарий «${saved.name}» сохранён на сервере и доступен в истории результатов.`, 'scenario.save');
       },
-      error: (error: unknown) => this.message.set(toUserMessage(error, 'Не удалось сохранить сценарий. Попробуйте ещё раз.')),
+      error: (error: unknown) => this.notify('error', toUserMessage(error, 'Не удалось сохранить сценарий. Попробуйте ещё раз.'), 'scenario.save'),
     });
   }
 
@@ -241,6 +265,7 @@ export class ScenarioStoreService {
       takeUntilDestroyed(this.destroyRef),
     ).subscribe({
       next: (items) => {
+        this.alerts.clear('scenario.history');
         if (revision === this.historyRevision) {
           this.savedScenarios.set(items);
         } else {
@@ -249,15 +274,22 @@ export class ScenarioStoreService {
           this.savedScenarios.set([...current, ...items.filter((item) => !ids.has(item.id))]);
         }
       },
-      error: (error: unknown) => this.historyError.set(toUserMessage(error, 'Не удалось загрузить историю сценариев. Попробуйте ещё раз.')),
+      error: (error: unknown) => {
+        const message = toUserMessage(error, 'Не удалось загрузить историю сценариев. Попробуйте ещё раз.');
+        this.historyError.set(message);
+        this.notify('error', message, 'scenario.history');
+      },
     });
   }
 
   openScenario(saved: SavedScenario): boolean {
     if (!this.hasDataset() || saved.datasetVersion !== this.dataset()?.datasetVersion || !this.isRestorable(saved.decisions)) {
-      this.historyError.set('Сценарий создан для другой версии данных или данные города ещё не загружены.');
+      const message = 'Сценарий создан для другой версии данных или данные города ещё не загружены.';
+      this.historyError.set(message);
+      this.notify('warning', message, 'scenario.open');
       return false;
     }
+    this.historyError.set(null);
     this.replaceDecisions(saved.decisions.map((decision) => ({ ...decision })));
     this.scenarioName.set(saved.name);
     this.serverResult.set(saved.result);
@@ -265,14 +297,15 @@ export class ScenarioStoreService {
     this.savedSignature.set(this.stateSignature(saved.name, saved.decisions));
     const district = saved.decisions.find((decision) => decision.districtId)?.districtId;
     if (district) this.selectedDistrictId.set(district);
-    this.message.set(`Открыт сохранённый сценарий «${saved.name}».`);
+    this.notify('success', `Открыт сохранённый сценарий «${saved.name}».`, 'scenario.open');
     return true;
   }
 
   selectDistrict(id: string): void {
-    if (!this.districtById(id)) return;
+    const district = this.districtById(id);
+    if (!district || this.selectedDistrictId() === id) return;
     this.selectedDistrictId.set(id);
-    this.message.set(null);
+    this.notify('info', `Выбран район ${district.name}. Мероприятия будут добавляться для этого района.`, 'scenario.district');
   }
 
   setDirection(direction: Direction | 'all'): void { this.activeDirection.set(direction); }
@@ -285,20 +318,21 @@ export class ScenarioStoreService {
     const candidate: Decision = measure.scope === 'district'
       ? { measureId, districtId: this.selectedDistrictId() } : { measureId };
     const error = this.validateAddition(candidate);
-    if (error) { this.message.set(error); return; }
+    if (error) { this.notify('warning', error, 'scenario.addition'); return; }
     this.replaceDecisions([...this.decisions(), candidate]);
-    this.message.set(`${measure.shortName}: добавлено ${measure.scope === 'city'
-      ? 'для всего города' : `для района ${this.selectedDistrict()?.name}`}`);
+    this.notify('success', `${measure.shortName}: добавлено ${measure.scope === 'city'
+      ? 'для всего города' : `для района ${this.selectedDistrict()?.name}`}`, 'scenario.addition');
   }
 
   removeDecision(measureId: string): void {
+    if (!this.isSelected(measureId)) return;
     this.replaceDecisions(this.decisions().filter((item) => item.measureId !== measureId));
-    this.message.set('Решение удалено. Можно выбрать другую инициативу.');
+    this.notify('info', 'Решение удалено. Можно выбрать другую инициативу.', 'scenario.selection');
   }
 
   reset(): void {
     this.replaceDecisions([]);
-    this.message.set(`Сценарий очищен. Выберите ${this.maxDecisions()} решений.`);
+    this.notify('info', `Сценарий очищен. Выберите ${this.maxDecisions()} решений.`, 'scenario.selection');
   }
 
   restoreDemo(): void {
@@ -306,7 +340,7 @@ export class ScenarioStoreService {
     if (!this.hasDataset() || !this.isRestorable(demo)) return;
     this.replaceDecisions(demo);
     this.selectedDistrictId.set('nura');
-    this.message.set('Демонстрационный набор восстановлен. Рассчитайте его на сервере.');
+    this.notify('success', 'Демонстрационный набор восстановлен. Рассчитайте его на сервере.', 'scenario.selection');
   }
 
   measureById(id: string) { return this.measures().find((item) => item.id === id); }
@@ -321,7 +355,16 @@ export class ScenarioStoreService {
     this.decisions.set(decisions);
     this.serverResult.set(null);
     this.analysis.set(null);
+    this.alerts.clear('scenario.addition');
+    this.alerts.clear('scenario.calculation');
+    this.alerts.clear('scenario.analysis');
+    this.alerts.clear('scenario.save');
     this.validateScenario();
+  }
+
+  private notify(type: 'success' | 'info' | 'warning' | 'error', message: string, key: string): void {
+    this.message.set(message);
+    this.alerts.notify(type, message, { key });
   }
 
   private validateAddition(candidate: Decision): string | null {

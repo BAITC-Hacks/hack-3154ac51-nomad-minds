@@ -1,0 +1,39 @@
+:host {
+  position: fixed;
+  z-index: 1100;
+  top: 88px;
+  right: 20px;
+  width: min(440px, calc(100vw - 32px));
+  pointer-events: none;
+}
+
+.app-alerts {
+  display: grid;
+  gap: 10px;
+  max-height: min(70dvh, 650px);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 4px;
+  scrollbar-width: thin;
+}
+
+.app-alert {
+  pointer-events: auto;
+  border-radius: 12px;
+  box-shadow: 0 6px 22px rgba(20, 43, 73, 0.14);
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+@media (max-width: 860px) {
+  :host { top: auto; bottom: max(12px, env(safe-area-inset-bottom)); right: 12px; width: calc(100vw - 24px); }
+  .app-alerts { max-height: 45dvh; }
+}

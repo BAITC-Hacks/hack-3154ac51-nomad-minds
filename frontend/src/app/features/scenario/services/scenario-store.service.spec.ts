@@ -1,8 +1,9 @@
 import { provideHttpClient } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
-import { SavedScenario, ValidationResponse } from '../../../core/api/models/scenario-api.models';
+import { AnalysisResponse, SavedScenario, ValidationResponse } from '../../../core/api/models/scenario-api.models';
 import { CALCULATION_FIXTURE, DATASET_FIXTURE, REFERENCE_DECISIONS } from '../../../core/api/testing/scenario-api.fixtures';
+import { AppAlertService } from '../../../core/services/app-alert.service';
 import { ScenarioStoreService } from './scenario-store.service';
 
 const COMPLETE: ValidationResponse = {
@@ -12,15 +13,21 @@ const SAVED: SavedScenario = {
   id: 'server-id', name: 'Мой сценарий', datasetVersion: DATASET_FIXTURE.datasetVersion,
   decisions: REFERENCE_DECISIONS, result: CALCULATION_FIXTURE, createdAt: '2026-09-23 12:00:00',
 };
+const ANALYSIS: AnalysisResponse = {
+  source: 'openai', model: 'test-model', summary: 'Анализ сценария',
+  strengths: [], risks: [], tradeoffs: [], recommendations: [],
+};
 
 describe('ScenarioStoreService API workflow', () => {
   let http: HttpTestingController;
   let store: ScenarioStoreService;
+  let alerts: AppAlertService;
 
   beforeEach(() => {
     TestBed.configureTestingModule({ providers: [provideHttpClient(), provideHttpClientTesting()] });
     http = TestBed.inject(HttpTestingController);
     store = TestBed.inject(ScenarioStoreService);
+    alerts = TestBed.inject(AppAlertService);
   });
 
   afterEach(() => http.verify());
@@ -48,8 +55,10 @@ describe('ScenarioStoreService API workflow', () => {
     expect(store.totalBudget()).toBe(100);
     expect(store.canCalculate()).toBe(true);
     expect(store.result()).toBeNull();
+    expect(alerts.alerts()).toEqual([]);
     calculate();
     expect(store.result()?.score).toBe(CALCULATION_FIXTURE.score);
+    expect(alerts.alerts().find((alert) => alert.key === 'scenario.calculation')?.type).toBe('success');
   });
 
   it('recovers from dataset connection failure and keeps all scenario actions disabled meanwhile', () => {
@@ -60,10 +69,14 @@ describe('ScenarioStoreService API workflow', () => {
     expect(store.canCalculate()).toBe(false);
     expect(store.canSave()).toBe(false);
     expect(store.loadError()).toContain('Нет соединения');
+    expect(alerts.alerts().find((alert) => alert.key === 'scenario.dataset')).toMatchObject({
+      type: 'error', message: store.loadError(),
+    });
     store.loadDataset();
     load();
     expect(store.loadError()).toBeNull();
     expect(store.hasDataset()).toBe(true);
+    expect(alerts.alerts().find((alert) => alert.key === 'scenario.dataset')).toBeUndefined();
   });
 
   it('cancels stale validation and calculation when the selection changes', () => {
@@ -79,6 +92,7 @@ describe('ScenarioStoreService API workflow', () => {
     http.expectOne('/api/v1/scenarios/validate').flush({ ...COMPLETE, complete: false });
     expect(store.result()).toBeNull();
     expect(store.canCalculate()).toBe(false);
+    expect(alerts.alerts().some((alert) => alert.type === 'error')).toBe(false);
   });
 
   it('recovers from validation failure without changing the selected decisions', () => {
@@ -87,10 +101,12 @@ describe('ScenarioStoreService API workflow', () => {
     http.expectOne('/api/v1/scenarios/validate').flush({}, { status: 503, statusText: 'Unavailable' });
     expect(store.canCalculate()).toBe(false);
     expect(store.validationErrors().length).toBe(1);
+    expect(alerts.alerts().find((alert) => alert.key === 'scenario.validation')?.type).toBe('error');
     store.validateScenario();
     http.expectOne('/api/v1/scenarios/validate').flush(COMPLETE);
     expect(store.validationErrors()).toEqual([]);
     expect(store.canCalculate()).toBe(true);
+    expect(alerts.alerts().find((alert) => alert.key === 'scenario.validation')).toBeUndefined();
   });
 
   it('sends the exact complete server result to analysis and discards stale analysis', () => {
@@ -103,6 +119,7 @@ describe('ScenarioStoreService API workflow', () => {
     expect(analysis.cancelled).toBe(true);
     expect(store.isAnalyzing()).toBe(false);
     expect(store.analysis()).toBeNull();
+    expect(alerts.alerts().some((alert) => alert.type === 'error')).toBe(false);
     http.expectOne('/api/v1/scenarios/validate').flush({ ...COMPLETE, complete: false });
   });
 
@@ -138,6 +155,10 @@ describe('ScenarioStoreService API workflow', () => {
     expect(store.isSaved()).toBe(false);
     expect(store.canSave()).toBe(true);
     expect(store.message()).toContain('Не удалось сохранить');
+    expect(alerts.alerts().find((alert) => alert.key === 'scenario.save')?.type).toBe('error');
+    store.openScenario(SAVED);
+    http.expectOne('/api/v1/scenarios/validate').flush(COMPLETE);
+    expect(alerts.alerts().some((alert) => alert.key === 'scenario.save')).toBe(false);
   });
 
   it('does not overwrite the opened snapshot metadata with an older pending save', () => {
@@ -171,11 +192,14 @@ describe('ScenarioStoreService API workflow', () => {
     history.flush([SAVED]);
     expect(store.savedScenarios().length).toBe(1);
     expect(store.openScenario({ ...SAVED, datasetVersion: 'different' })).toBe(false);
+    expect(alerts.alerts().find((alert) => alert.key === 'scenario.open')?.type).toBe('warning');
     expect(store.openScenario(store.savedScenarios()[0])).toBe(true);
     http.expectOne('/api/v1/scenarios/validate').flush(COMPLETE);
     expect(store.result()?.score).toBe(CALCULATION_FIXTURE.score);
     expect(store.decisions()).toEqual(REFERENCE_DECISIONS);
     expect(store.isSaved()).toBe(true);
+    expect(store.historyError()).toBeNull();
+    expect(alerts.alerts().find((alert) => alert.key === 'scenario.open')?.type).toBe('success');
   });
 
   it('rejects a business-invalid calculation even when it arrives with HTTP 200', () => {
@@ -188,5 +212,116 @@ describe('ScenarioStoreService API workflow', () => {
     expect(store.result()).toBeNull();
     expect(store.canCalculate()).toBe(false);
     expect(store.validationErrors()[0]).toContain('несовместимы');
+    expect(alerts.alerts().find((alert) => alert.key === 'scenario.calculation')).toMatchObject({
+      type: 'warning', message: store.validationErrors()[0],
+    });
+  });
+
+  it('announces district changes and scenario edits while avoiding duplicate selections', () => {
+    load();
+    store.selectDistrict(store.selectedDistrictId());
+    expect(alerts.alerts()).toEqual([]);
+    store.selectDistrict('esil');
+    expect(alerts.alerts().find((alert) => alert.key === 'scenario.district')).toMatchObject({
+      type: 'info', message: expect.stringContaining(store.selectedDistrict()!.name),
+    });
+    const districtAlertId = alerts.alerts().find((alert) => alert.key === 'scenario.district')?.id;
+    store.selectDistrict('esil');
+    expect(alerts.alerts().find((alert) => alert.key === 'scenario.district')?.id).toBe(districtAlertId);
+
+    store.addMeasure('M5');
+    expect(alerts.alerts().find((alert) => alert.key === 'scenario.addition')).toMatchObject({
+      type: 'warning', message: 'Это мероприятие уже выбрано.',
+    });
+    http.expectNone('/api/v1/scenarios/validate');
+    store.removeDecision('M5');
+    const spent = COMPLETE.budget.spent - store.measureById('M5')!.cost;
+    http.expectOne('/api/v1/scenarios/validate').flush({
+      ...COMPLETE, complete: false, budget: { total: 100, spent, remaining: 100 - spent },
+    });
+    expect(alerts.alerts().find((alert) => alert.key === 'scenario.selection')?.type).toBe('info');
+    expect(alerts.alerts().find((alert) => alert.key === 'scenario.addition')).toBeUndefined();
+    store.addMeasure('M5');
+    http.expectOne('/api/v1/scenarios/validate').flush(COMPLETE);
+    expect(alerts.alerts().find((alert) => alert.key === 'scenario.addition')?.type).toBe('success');
+
+    store.reset();
+    http.expectOne('/api/v1/scenarios/validate').flush({ ...COMPLETE, complete: false });
+    expect(alerts.alerts().find((alert) => alert.key === 'scenario.selection')).toMatchObject({
+      type: 'info', message: expect.stringContaining('очищен'),
+    });
+    store.restoreDemo();
+    http.expectOne('/api/v1/scenarios/validate').flush(COMPLETE);
+    expect(alerts.alerts().find((alert) => alert.key === 'scenario.selection')).toMatchObject({
+      type: 'success', message: expect.stringContaining('восстановлен'),
+    });
+  });
+
+  it('presents backend validation warnings and clears them after a successful recheck', () => {
+    load();
+    store.validateScenario();
+    http.expectOne('/api/v1/scenarios/validate').flush({
+      ...COMPLETE, valid: false, complete: false,
+      validationErrors: ['Measures M1 and M3 are incompatible in one scenario.'],
+    });
+    expect(alerts.alerts().find((alert) => alert.key === 'scenario.validation')).toMatchObject({
+      type: 'warning', message: expect.stringContaining('несовместимы'),
+    });
+    store.validateScenario();
+    http.expectOne('/api/v1/scenarios/validate').flush(COMPLETE);
+    expect(alerts.alerts().find((alert) => alert.key === 'scenario.validation')).toBeUndefined();
+  });
+
+  it('preserves server error messages and replaces them with successful operation feedback', () => {
+    load();
+    store.calculateScenario();
+    http.expectOne('/api/v1/scenarios/calculate').flush({ detail: 'Расчёт временно недоступен.' }, { status: 409, statusText: 'Conflict' });
+    expect(alerts.alerts().find((alert) => alert.key === 'scenario.calculation')).toMatchObject({
+      type: 'error', message: 'Расчёт временно недоступен.',
+    });
+    calculate();
+    expect(alerts.alerts().filter((alert) => alert.key === 'scenario.calculation')).toMatchObject([{ type: 'success' }]);
+
+    store.analyzeScenario();
+    http.expectOne('/api/v1/scenarios/analyze').flush({ detail: 'Сервис анализа занят.' }, { status: 409, statusText: 'Conflict' });
+    expect(alerts.alerts().find((alert) => alert.key === 'scenario.analysis')).toMatchObject({
+      type: 'error', message: 'Сервис анализа занят.',
+    });
+    store.analyzeScenario();
+    http.expectOne('/api/v1/scenarios/analyze').flush(ANALYSIS);
+    expect(alerts.alerts().filter((alert) => alert.key === 'scenario.analysis')).toMatchObject([{ type: 'success' }]);
+
+    store.saveScenario();
+    http.expectOne('/api/v1/scenarios').flush({ detail: 'Хранилище недоступно.' }, { status: 409, statusText: 'Conflict' });
+    expect(alerts.alerts().find((alert) => alert.key === 'scenario.save')).toMatchObject({
+      type: 'error', message: 'Хранилище недоступно.',
+    });
+    store.saveScenario();
+    http.expectOne('/api/v1/scenarios').flush(SAVED);
+    expect(alerts.alerts().filter((alert) => alert.key === 'scenario.save')).toMatchObject([{ type: 'success' }]);
+  });
+
+  it('warns when analysis uses the fallback while retaining the returned analysis', () => {
+    load();
+    calculate();
+    store.analyzeScenario();
+    http.expectOne('/api/v1/scenarios/analyze').flush({ ...ANALYSIS, source: 'fallback', model: null });
+    expect(store.analysis()?.source).toBe('fallback');
+    expect(alerts.alerts().find((alert) => alert.key === 'scenario.analysis')).toMatchObject({
+      type: 'warning', message: expect.stringContaining('базовый анализ'),
+    });
+  });
+
+  it('reports history errors and clears the alert when a retry succeeds without a success notification', () => {
+    load();
+    store.loadHistory();
+    http.expectOne('/api/v1/scenarios').flush({ detail: 'История временно недоступна.' }, { status: 409, statusText: 'Conflict' });
+    expect(alerts.alerts().find((alert) => alert.key === 'scenario.history')).toMatchObject({
+      type: 'error', message: 'История временно недоступна.',
+    });
+    store.loadHistory();
+    http.expectOne('/api/v1/scenarios').flush([SAVED]);
+    expect(store.historyError()).toBeNull();
+    expect(alerts.alerts()).toEqual([]);
   });
 });

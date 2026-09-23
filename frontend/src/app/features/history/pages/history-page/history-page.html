@@ -21,10 +21,6 @@
       <nz-alert nzType="info" nzShowIcon nzMessage="Для открытия сценария необходимо загрузить данные города. Проверьте подключение на странице сценария." />
     }
 
-    @if (store.message(); as message) {
-      <p class="history-message" role="status">{{ message }}</p>
-    }
-
     <nz-table
       #historyTable
       [nzData]="store.savedScenarios()"

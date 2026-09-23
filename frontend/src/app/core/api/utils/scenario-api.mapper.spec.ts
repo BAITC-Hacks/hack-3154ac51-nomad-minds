@@ -78,4 +78,13 @@ describe('scenario API mapping', () => {
     expect(result.risks[0]).toContain('Нура');
     expect(result.tradeoffs).toEqual(['Использовано 95 из 100 единиц бюджета.']);
   });
+
+  it('keeps server explanations that have no bundled translation', () => {
+    const message = 'Сценарий с таким названием уже существует.';
+    expect(toUserMessage(new HttpErrorResponse({ status: 409, error: { detail: message } }), 'Ошибка')).toBe(message);
+    expect(toUserMessage(new HttpErrorResponse({ status: 400, error: { message } }), 'Ошибка')).toBe(message);
+    expect(translateValidationError(message)).toBe(message);
+    expect(toUserMessage(new HttpErrorResponse({ status: 422, error: { detail: [{ msg: 'Field required' }] } }), 'Ошибка'))
+      .toBe('Сервер не принял данные. Проверьте название сценария и выбранные мероприятия.');
+  });
 });
