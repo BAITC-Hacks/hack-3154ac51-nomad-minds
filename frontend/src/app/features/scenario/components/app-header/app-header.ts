@@ -25,8 +25,8 @@ export class AppHeader {
   protected readonly now = signal(new Date());
 
   private readonly dateFormatter = new Intl.DateTimeFormat('ru-RU', {
-    day: 'numeric',
-    month: 'long',
+    day: '2-digit',
+    month: '2-digit',
     year: 'numeric',
   });
 

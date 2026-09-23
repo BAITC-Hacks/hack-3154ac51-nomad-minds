@@ -12,9 +12,9 @@ import { ScenarioStoreService } from '../../services/scenario-store.service';
 export class DistrictList {
   protected readonly store = inject(ScenarioStoreService);
 
-  protected scoreFor(districtId: string): number {
-    return this.store.result().districts.find(
+  protected scoreFor(districtId: string): number | null {
+    return this.store.baselineResult()?.districts.find(
       (item) => item.districtId === districtId,
-    )?.before ?? 0;
+    )?.before ?? null;
   }
 }

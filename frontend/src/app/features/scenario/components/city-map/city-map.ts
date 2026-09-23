@@ -5,6 +5,7 @@ import {
   HostListener,
   OnDestroy,
   ViewChild,
+  computed,
   effect,
   inject,
   signal,
@@ -41,10 +42,12 @@ export class CityMap implements AfterViewInit, OnDestroy {
   protected readonly isFullscreen = signal(false);
   protected readonly loading = signal(true);
   protected readonly loadError = signal(false);
-  protected readonly mapDistricts = [
-    ...this.store.districts.map(({ id, name, color }) => ({ id, name, color, available: true })),
-    { id: 'sarayshyk', name: 'Сарайшык', color: '#d6a516', available: false },
-  ];
+  protected readonly mapDistricts = computed(() => [
+    ...this.store.districts().map(({ id, name, color }) => ({ id, name, color, available: true })),
+    ...(!this.store.districtById('sarayshyk')
+      ? [{ id: 'sarayshyk', name: 'Сарайшык', color: '#d6a516', available: false }]
+      : []),
+  ]);
   private map?: L.Map;
   private bounds?: L.LatLngBounds;
   private resizeObserver?: ResizeObserver;
@@ -98,14 +101,14 @@ export class CityMap implements AfterViewInit, OnDestroy {
       if (!response.ok) throw new Error('District boundaries unavailable');
       const data: FeatureCollection<MultiPolygon, DistrictGeometryProperties> = await response.json();
       if (this.abortController.signal.aborted) return;
-      if (data.type !== 'FeatureCollection' || data.features.length !== this.mapDistricts.length ||
-          !this.mapDistricts.every((district) => data.features.some((f) => f.properties.id === district.id))) {
+      if (data.type !== 'FeatureCollection' || data.features.length !== this.mapDistricts().length ||
+          !this.mapDistricts().every((district) => data.features.some((f) => f.properties.id === district.id))) {
         throw new Error('Incomplete district boundaries');
       }
 
       const bounds = L.latLngBounds([]);
       for (const feature of data.features) {
-        const district = this.mapDistricts.find((item) => item.id === feature.properties.id)!;
+        const district = this.mapDistricts().find((item) => item.id === feature.properties.id)!;
         const polygon = L.geoJSON(feature, {
           style: this.districtStyle(district.id, this.store.selectedDistrictId()),
         }).addTo(this.map!);
@@ -138,7 +141,7 @@ export class CityMap implements AfterViewInit, OnDestroy {
   }
 
   protected selectDistrict(id: string): void {
-    if (this.mapDistricts.find((district) => district.id === id)?.available) {
+    if (this.mapDistricts().find((district) => district.id === id)?.available) {
       this.store.selectDistrict(id);
     } else {
       this.polygonLayers.get(id)?.openPopup();
@@ -203,7 +206,7 @@ export class CityMap implements AfterViewInit, OnDestroy {
   }
 
   private districtStyle(id: string, selectedId: string): L.PathOptions {
-    const color = this.mapDistricts.find((district) => district.id === id)!.color;
+    const color = this.mapDistricts().find((district) => district.id === id)?.color ?? '#8598ac';
     return {
       color,
       fillColor: color,

@@ -93,6 +93,13 @@
 
 .validation-strip.complete strong { color: #136f3b; }
 .validation-strip nz-icon { color: #2fc579; }
+.validation-errors { margin: 0 12px 12px; padding-left: 20px; color: #c63737; font-size: 12px; }
+.validation-retry { padding: 0 12px 12px; }
+.name-error { color: #c63737; }
+.scenario-actions { padding: 0 12px 12px; }
+.scenario-actions label { display: block; margin-bottom: 4px; color: #536e8d; font-size: 12px; }
+.action-buttons { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
+.remove-button:disabled { cursor: default; opacity: 0.4; }
 
 @media (max-width: 620px) {
   .decision-row {
@@ -102,4 +109,3 @@
   .decision-row > :nth-child(4) { display: none; }
   .validation-strip { flex-wrap: wrap; }
 }
-

@@ -30,6 +30,8 @@
 .brand small {
   display: block;
 }
+.brand .api-status { font-size: 10px; color: #a66b1e; }
+.brand .api-status.connected { color: #16804a; }
 
 .brand strong {
   font-size: 21px;
@@ -185,8 +187,16 @@ nav a.active {
 @media (max-width: 1600px) {
   .app-header {
     grid-template-columns: minmax(240px, 1fr) minmax(210px, 0.7fr) auto minmax(300px, auto);
+    padding-top: 10px;
+    padding-bottom: 10px;
   }
-  nav { display: none; }
+  nav {
+    grid-column: 1 / -1;
+    grid-row: 2;
+    min-width: 0;
+    overflow-x: auto;
+  }
+  nav a { white-space: nowrap; }
 }
 
 @media (max-width: 960px) {
@@ -210,6 +220,7 @@ nav a.active {
     grid-column: 2;
     grid-row: 1;
   }
+  nav { grid-row: 3; }
 }
 
 @media (max-width: 720px) {

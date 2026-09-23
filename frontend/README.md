@@ -1,59 +1,74 @@
-# Frontend
+# Фронтенд «Аким на 5 часов»
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 22.1.8.
+Angular 22, NG-ZORRO и Leaflet. Фронтенд получает данные города, проверяет решения,
+рассчитывает результат, запрашивает AI-анализ и сохраняет сценарии через backend API.
 
-## Development server
+## Локальный запуск
 
-To start a local development server, run:
-
-```bash
-ng serve
-```
-
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
-
-## Code scaffolding
-
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
+Сначала запустите backend из корня репозитория:
 
 ```bash
-ng generate component component-name
+python -m pip install -r backend/requirements.txt
+cp .env.example .env
+python backend/api.py
 ```
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
+В отдельном терминале запустите фронтенд:
 
 ```bash
-ng generate --help
+cd frontend
+npm ci
+npm start
 ```
 
-## Building
+Откройте [http://localhost:4200](http://localhost:4200). Angular dev server
+проксирует `/api/**` на `http://127.0.0.1:8000` через `proxy.conf.json`.
+Если backend работает на другом локальном порту, измените `target` в этом файле
+и перезапустите `npm start`.
 
-To build the project run:
+## Настройка API при развёртывании
+
+Адрес API читается из публичного `config.js` до запуска Angular:
+
+```js
+window.__NOMAD_CONFIG__ = {
+  apiBaseUrl: '/api/v1',
+};
+```
+
+По умолчанию API находится на том же домене: настройте обратный прокси для `/api/`
+на backend. Для отдельного backend, в том числе NVIDIA Brev, укажите полный адрес
+с суффиксом `/api/v1`, например `https://backend.example.com/api/v1`.
+В backend `.env` добавьте домен фронтенда в `CORS_ORIGINS`.
+
+Перед сборкой настройка находится в `public/config.js`. После сборки её можно
+изменить в `dist/frontend/browser/config.js` без повторной компиляции Angular.
+При обновлении конфигурации учитывайте кэш CDN/браузера. Для переходов на
+`/scenario` и `/results` настройте возврат `index.html` для маршрутов приложения.
+
+`config.js` доступен любому посетителю. `OPENAI_API_KEY` и остальные секреты
+хранятся только в backend `.env`; не добавляйте их во фронтенд.
+
+## Подключённые операции
+
+| API | Использование в интерфейсе |
+| --- | --- |
+| `GET /api/v1/health` | Проверка подключения к серверу и доступного AI-провайдера |
+| `GET /api/v1/dataset` | Районы, каталог мер, бюджет, правила и базовые показатели |
+| `POST /api/v1/scenarios/validate` | Проверка выбранных решений и бюджета |
+| `POST /api/v1/scenarios/calculate` | Расчёт результатов сценария |
+| `POST /api/v1/scenarios/analyze` | AI-анализ рассчитанного результата |
+| `POST /api/v1/scenarios` | Сохранение именованного сценария на сервере |
+| `GET /api/v1/scenarios` | История результатов и открытие сохранённых сценариев |
+
+История хранится в SQLite backend. Для открытия сохранённого сценария необходимо
+загрузить данные города; сценарии другой версии данных не открываются как текущие.
+
+## Проверки и сборка
 
 ```bash
-ng build
+npm test -- --watch=false
+npm run build
 ```
 
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
-
-## Running unit tests
-
-To execute unit tests with the [Vitest](https://vitest.dev/) test runner, use the following command:
-
-```bash
-ng test
-```
-
-## Running end-to-end tests
-
-For end-to-end (e2e) testing, run:
-
-```bash
-ng e2e
-```
-
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
-
-## Additional Resources
-
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+Готовые статические файлы находятся в `dist/frontend/browser`.

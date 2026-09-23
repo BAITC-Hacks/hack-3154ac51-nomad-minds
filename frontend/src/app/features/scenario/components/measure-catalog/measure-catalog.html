@@ -49,7 +49,7 @@
             nzSize="small"
             type="button"
             [nzType]="store.isSelected(measure.id) ? 'default' : 'primary'"
-            [disabled]="store.isSelected(measure.id)"
+            [disabled]="store.isSelected(measure.id) || !store.hasDataset() || store.isSaving() || store.isCalculating() || store.isAnalyzing()"
             (click)="store.addMeasure(measure.id)"
           >
             @if (store.isSelected(measure.id)) {
@@ -66,12 +66,8 @@
   </div>
 
   <footer class="catalog-footer">
-    <span>
-      Выбранный район: <b [style.color]="store.selectedDistrict().color">{{ store.selectedDistrict().name }}</b>
-    </span>
-    @if (store.message()) {
-      <span class="catalog-message">{{ store.message() }}</span>
+    @if (store.selectedDistrict(); as district) {
+      <span>Выбранный район: <b [style.color]="district.color">{{ district.name }}</b></span>
     }
   </footer>
 </section>
-

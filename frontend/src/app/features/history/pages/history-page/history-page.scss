@@ -1,0 +1,69 @@
+.history-page {
+  max-width: 1440px;
+  margin: 0 auto;
+  padding: 24px 16px;
+}
+
+.panel {
+  padding: 24px;
+}
+
+.history-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+h1 {
+  margin: 0 0 8px;
+  color: var(--text);
+  font-size: 26px;
+}
+
+p {
+  margin: 0;
+  color: var(--muted);
+}
+
+.history-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+nz-alert {
+  display: block;
+  margin-bottom: 16px;
+}
+
+.history-message {
+  margin-bottom: 16px;
+}
+
+.scenario-name {
+  display: block;
+  max-width: 280px;
+  overflow-wrap: anywhere;
+}
+
+.dataset-version {
+  display: block;
+  margin-top: 4px;
+  color: var(--muted);
+}
+
+.positive {
+  color: #148448;
+}
+
+.negative {
+  color: #c53535;
+}
+
+@media (max-width: 680px) {
+  .history-page { padding: 12px 10px; }
+  .panel { padding: 16px; }
+  .history-heading { align-items: flex-start; flex-direction: column; }
+}

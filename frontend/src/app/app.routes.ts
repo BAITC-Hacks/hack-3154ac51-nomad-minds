@@ -12,14 +12,9 @@ export const routes: Routes = [
   {
     path: 'results',
     loadComponent: () =>
-      import('./shared/pages/placeholder-page/placeholder-page').then(
-        (component) => component.PlaceholderPage,
+      import('./features/history/pages/history-page/history-page').then(
+        (component) => component.HistoryPage,
       ),
-    data: {
-      title: 'История результатов',
-      description: 'Здесь появятся сохранённые расчёты, версии сценария и подробная история изменений показателей.',
-      icon: 'line-chart',
-    },
   },
   {
     path: 'comparison',

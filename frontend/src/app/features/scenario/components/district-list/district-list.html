@@ -5,7 +5,7 @@
   </div>
 
   <div class="districts">
-    @for (district of store.districts; track district.id) {
+    @for (district of store.districts(); track district.id) {
       <button
         type="button"
         class="district-item"
@@ -22,7 +22,7 @@
           <strong>{{ district.name }}</strong>
           <small>{{ district.populationShare * 100 | number: '1.0-0' }}% населения</small>
         </span>
-        <span class="district-score">D: {{ scoreFor(district.id) | number: '1.1-1' }}</span>
+        <span class="district-score">D: {{ (scoreFor(district.id) | number: '1.1-1') ?? '—' }}</span>
         <nz-icon class="district-chevron" nzType="right" />
       </button>
     }

@@ -1,4 +1,17 @@
 <main id="scenario" class="scenario-page">
+  @if (store.isLoading()) {
+    <div class="dataset-status" role="status"><nz-spin nzSimple /><span>Загрузка данных города…</span></div>
+  }
+  @if (store.loadError(); as error) {
+    <div class="dataset-status">
+      <nz-alert nzType="error" nzShowIcon [nzMessage]="error" />
+      <button nz-button type="button" [disabled]="store.isLoading()" (click)="store.loadDataset()">Повторить загрузку</button>
+    </div>
+  }
+  @if (store.message(); as message) {
+    <div class="scenario-message" role="status"><nz-alert nzType="info" nzShowIcon [nzMessage]="message" /></div>
+  }
+  @if (store.hasDataset()) {
   <section class="workspace-row workspace-districts" aria-label="Районы и карта города">
     <app-district-list />
     <app-city-map />
@@ -11,4 +24,5 @@
     <app-scenario-results />
     <app-ai-analysis />
   </section>
+  }
 </main>

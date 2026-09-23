@@ -1,45 +1,57 @@
 <section id="results" class="panel results-panel">
   <div class="panel-heading">
     <h2><nz-icon nzType="aim" /> Результаты сценария</h2>
-    <button class="help" type="button" aria-label="Как рассчитывается результат">?</button>
+    <button nz-button nzSize="small" type="button" [attr.aria-label]="store.result() ? 'Пересчитать' : 'Рассчитать'" [nzLoading]="store.isCalculating()" [disabled]="!store.canCalculate()" (click)="store.calculateScenario()">
+      {{ store.result() ? 'Пересчитать' : 'Рассчитать' }}
+    </button>
   </div>
 
+  @if (store.result(); as scenario) {
   <div class="score-grid">
     <article class="main-score">
-      <span>Astana Quality of Life Score</span>
-      <strong>{{ store.result().score | number: '1.1-1' }}</strong>
-      <b [class.negative]="store.result().scoreDelta < 0">
-        <nz-icon [nzType]="store.result().scoreDelta >= 0 ? 'arrow-up' : 'arrow-down'" />
-        {{ store.result().scoreDelta >= 0 ? '+' : '' }}{{ store.result().scoreDelta | number: '1.1-1' }} к базе
+      <span>Индекс качества жизни Астаны</span>
+      <strong>{{ scenario.score | number: '1.1-1' }}</strong>
+      <b [class.negative]="scenario.scoreDelta < 0">
+        <nz-icon [nzType]="scenario.scoreDelta >= 0 ? 'arrow-up' : 'arrow-down'" />
+        {{ scenario.scoreDelta >= 0 ? '+' : '' }}{{ scenario.scoreDelta | number: '1.1-1' }} к базе
       </b>
     </article>
     <article class="metric-card">
       <span>Средний балл<br />города</span>
-      <strong>{{ store.result().cityAverage | number: '1.1-1' }}</strong>
-      <b>↑ {{ store.result().cityAverage - 56.86 | number: '1.1-1' }}</b>
+      <strong>{{ scenario.cityAverage | number: '1.1-1' }}</strong>
+      @if (store.baselineResult(); as baseline) {
+        @let delta = scenario.cityAverage - baseline.cityAverage;
+        <b [class.negative]="delta < 0">{{ delta >= 0 ? '+' : '' }}{{ delta | number: '1.1-1' }}</b>
+      }
     </article>
     <article class="metric-card weakest">
       <span>Самый слабый<br />район</span>
-      <b>{{ store.districtById(store.result().weakestDistrictId)?.name }}</b>
+      <b>{{ store.districtById(scenario.weakestDistrictId)?.name }}</b>
       <strong>
         {{ weakestScore() | number: '1.1-1' }}
       </strong>
-      <small>Критичных значений: {{ store.result().criticalCount }}</small>
+      <small>Критичных значений: {{ scenario.criticalCount }}</small>
     </article>
   </div>
 
   <div class="district-dynamics">
     <h3>Динамика по районам</h3>
     <div class="dynamics-head"><span>Район</span><span>До</span><span>После</span><span>Δ</span></div>
-    @for (result of store.result().districts; track result.districtId) {
-      @let district = store.districtById(result.districtId)!;
+    @for (result of scenario.districts; track result.districtId) {
+      @let district = store.districtById(result.districtId);
       <div class="dynamics-row">
-        <span class="district-name"><i [style.background]="district.color"></i>{{ district.name }}</span>
-        <span class="bar before"><i [style.width.%]="result.before"></i><b>{{ result.before | number: '1.1-1' }}</b></span>
-        <span class="bar after"><i [style.width.%]="result.after"></i><b>{{ result.after | number: '1.1-1' }}</b></span>
-        <strong>{{ result.delta >= 0 ? '+' : '' }}{{ result.delta | number: '1.1-1' }}</strong>
+        <span class="district-name"><i [style.background]="district?.color"></i>{{ district?.name ?? result.districtId }}</span>
+        <span class="bar before"><span class="bar-track"><i [style.width.%]="result.before"></i></span><b>{{ result.before | number: '1.1-1' }}</b></span>
+        <span class="bar after"><span class="bar-track"><i [style.width.%]="result.after"></i></span><b>{{ result.after | number: '1.1-1' }}</b></span>
+        <strong [class.negative]="result.delta < 0">{{ result.delta >= 0 ? '+' : '' }}{{ result.delta | number: '1.1-1' }}</strong>
       </div>
     }
   </div>
-
+  } @else {
+    <div class="results-empty" role="status">
+      <nz-icon nzType="bar-chart" />
+      <strong>{{ store.isCalculating() ? 'Рассчитываем сценарий…' : 'Результаты появятся после расчёта' }}</strong>
+      <span>Выберите {{ store.maxDecisions() }} решений и нажмите «Рассчитать сценарий».</span>
+    </div>
+  }
 </section>

@@ -11,18 +11,9 @@ import { ScenarioStoreService } from '../../services/scenario-store.service';
 })
 export class AiAnalysis {
   protected readonly store = inject(ScenarioStoreService);
-  protected analyzing = false;
-
-  protected runAnalysis(): void {
-    this.analyzing = true;
-    window.setTimeout(() => {
-      this.analyzing = false;
-      this.store.message.set('Моковый AI-разбор сценария обновлён.');
-    }, 700);
-  }
 
   protected radarPoints(kind: 'before' | 'after'): string {
-    const values = this.store.result().directions.map((item) => item[kind]);
+    const values = this.store.result()?.directions.map((item) => item[kind]) ?? [];
     return values.map((value, index) => {
       const angle = -Math.PI / 2 + index * ((Math.PI * 2) / values.length);
       const radius = 45 * (value / 100);

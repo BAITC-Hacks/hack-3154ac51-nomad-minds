@@ -1,0 +1,72 @@
+<main class="history-page">
+  <section class="panel">
+    <header class="history-heading">
+      <div>
+        <h1>История результатов</h1>
+        <p>Сохранённые сценарии и их результаты на сервере.</p>
+      </div>
+      <div class="history-actions">
+        <button nz-button type="button" [nzLoading]="store.isLoadingHistory()" (click)="store.loadHistory()">
+          Обновить
+        </button>
+        <a nz-button nzType="primary" routerLink="/scenario">К сценарию</a>
+      </div>
+    </header>
+
+    @if (store.historyError(); as error) {
+      <nz-alert nzType="error" nzShowIcon [nzMessage]="error" />
+    }
+
+    @if (!store.hasDataset()) {
+      <nz-alert nzType="info" nzShowIcon nzMessage="Для открытия сценария необходимо загрузить данные города. Проверьте подключение на странице сценария." />
+    }
+
+    @if (store.message(); as message) {
+      <p class="history-message" role="status">{{ message }}</p>
+    }
+
+    <nz-table
+      #historyTable
+      [nzData]="store.savedScenarios()"
+      [nzLoading]="store.isLoadingHistory()"
+      [nzPageSize]="10"
+      [nzHideOnSinglePage]="true"
+      [nzScroll]="{ x: '760px' }"
+      [nzNoResult]="store.historyError() ? 'Не удалось получить историю. Нажмите «Обновить», чтобы повторить.' : 'Пока нет сохранённых сценариев. Рассчитайте и сохраните сценарий, чтобы он появился здесь.'"
+    >
+      <thead>
+        <tr>
+          <th>Сценарий</th>
+          <th>Сохранён</th>
+          <th>Score</th>
+          <th>Изменение</th>
+          <th>Бюджет</th>
+          <th>Решения</th>
+          <th>Действие</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (scenario of historyTable.data; track scenario.id) {
+          <tr>
+            <td>
+              <strong class="scenario-name">{{ scenario.name }}</strong>
+              <small class="dataset-version">Версия данных: {{ scenario.datasetVersion }}</small>
+            </td>
+            <td>{{ scenario.createdAt | date: 'dd.MM.yyyy HH:mm' }}</td>
+            <td><strong>{{ scenario.result.score | number: '1.1-1' }}</strong></td>
+            <td [class.positive]="scenario.result.scoreDelta > 0" [class.negative]="scenario.result.scoreDelta < 0">
+              {{ scenario.result.scoreDelta > 0 ? '+' : '' }}{{ scenario.result.scoreDelta | number: '1.1-1' }}
+            </td>
+            <td>{{ scenario.result.budget.spent }} / {{ scenario.result.budget.total }}</td>
+            <td>{{ scenario.decisions.length }}</td>
+            <td>
+              <button nz-button type="button" [disabled]="!store.hasDataset()" (click)="openScenario(scenario)">
+                Открыть
+              </button>
+            </td>
+          </tr>
+        }
+      </tbody>
+    </nz-table>
+  </section>
+</main>

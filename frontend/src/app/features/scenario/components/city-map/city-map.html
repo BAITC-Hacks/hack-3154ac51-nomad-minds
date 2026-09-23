@@ -10,7 +10,7 @@
   <div class="panel-heading map-heading">
     <div class="map-title">
       <h2 id="city-map-title">Карта районов</h2>
-      <span>Астана · 6 районов</span>
+      <span>Астана · {{ mapDistricts().length }} районов</span>
     </div>
     <div class="map-actions">
       <button type="button" class="map-action city-reset" (click)="showCity()" title="Показать весь город" aria-label="Показать весь город">
@@ -53,7 +53,7 @@
   </div>
   <div class="map-footer">
     <div class="legend" aria-label="Выбор района">
-      @for (district of mapDistricts; track district.id) {
+      @for (district of mapDistricts(); track district.id) {
         <button
           type="button"
           [class.active]="store.selectedDistrictId() === district.id"

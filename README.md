@@ -33,7 +33,31 @@ Copy `.env.example` to `.env` and change values when needed:
 - `OPENAI_MODEL`: model used for structured analysis, default `gpt-4o-mini`.
 - `OPENAI_TIMEOUT_SECONDS`: provider timeout before the fallback is returned.
 
-The `.env` file can contain secrets later and must not be committed.
+The `.env` file may contain secrets and must not be committed. Keep
+`OPENAI_API_KEY` on the backend only; never put it in frontend configuration.
+
+## Frontend setup
+
+Start the backend on port `8000`, then run in a separate terminal:
+
+```bash
+cd frontend
+npm ci
+npm start
+```
+
+Open [http://localhost:4200](http://localhost:4200). The development server proxies
+`/api/**` to `http://127.0.0.1:8000`. The frontend uses all seven `/api/v1`
+endpoints below for server status, city data, validation, calculation, AI analysis,
+scenario saving, and the results history at `/results`.
+
+For deployment, set `apiBaseUrl` in `frontend/public/config.js` (or in the built
+`dist/frontend/browser/config.js`) to the backend URL including `/api/v1`.
+The default `/api/v1` assumes a reverse proxy on the same origin.
+For a separate backend origin, also configure backend `CORS_ORIGINS`.
+No frontend rebuild is needed when editing the deployed `config.js`.
+
+See [frontend/README.md](frontend/README.md) for configuration and verification commands.
 
 ## Backend API
 
@@ -73,4 +97,5 @@ python backend/api.py
 ```
 
 Expose port `8000` in the Brev web console. Use the generated tunnel URL as the
-frontend API base URL, and set `CORS_ORIGINS` to the deployed frontend origin.
+frontend API base URL with the `/api/v1` suffix in `config.js`, and set
+`CORS_ORIGINS` to the deployed frontend origin.

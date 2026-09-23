@@ -1,12 +1,12 @@
 <section class="panel decisions-panel">
   <div class="panel-heading">
     <h2>
-      Выбранные решения ({{ store.decisions().length }}/{{ store.maxDecisions }})
+      Выбранные решения ({{ store.decisions().length }}/{{ store.maxDecisions() }})
       @if (store.isComplete()) {
         <nz-icon class="complete-icon" nzType="check-circle" nzTheme="fill" />
       }
     </h2>
-    <button nz-button nzSize="small" type="button" (click)="store.reset()">Очистить всё</button>
+    <button nz-button nzSize="small" type="button" [disabled]="store.isSaving() || store.isCalculating() || store.isAnalyzing()" (click)="store.reset()">Очистить всё</button>
   </div>
 
   <div class="decision-table" role="table" aria-label="Выбранные решения">
@@ -31,6 +31,7 @@
           class="remove-button"
           type="button"
           aria-label="Удалить решение"
+          [disabled]="store.isSaving() || store.isCalculating() || store.isAnalyzing()"
           (click)="store.removeDecision(measure.id)"
         >
           <nz-icon nzType="close" />
@@ -39,22 +40,53 @@
     } @empty {
       <div class="empty-state">
         <nz-icon nzType="inbox" />
-        <span>Выберите пять инициатив из каталога</span>
-        <button nz-button nzSize="small" type="button" (click)="store.restoreDemo()">
+        <span>Выберите {{ store.maxDecisions() }} инициатив из каталога</span>
+        <button nz-button nzSize="small" type="button" [disabled]="store.isSaving() || store.isCalculating() || store.isAnalyzing()" (click)="store.restoreDemo()">
           Вернуть демо-набор
         </button>
       </div>
     }
   </div>
 
-  <div class="validation-strip" [class.complete]="store.isComplete()">
+  <div class="validation-strip" [class.complete]="store.isComplete() && !store.isValidating() && !store.validationErrors().length" role="status">
     <strong>
-      <nz-icon [nzType]="store.isComplete() ? 'check-circle' : 'info-circle'" nzTheme="fill" />
-      {{ store.isComplete() ? 'Набор валиден' : 'Соберите 5 решений' }}
+      <nz-icon [nzType]="store.isComplete() && !store.validationErrors().length ? 'check-circle' : 'info-circle'" nzTheme="fill" />
+      @if (store.isValidating()) {
+        Проверяем сценарий…
+      } @else if (store.validationErrors().length) {
+        Исправьте ошибки
+      } @else if (store.isComplete()) {
+        Выбрано {{ store.maxDecisions() }} решений
+      } @else {
+        Соберите {{ store.maxDecisions() }} решений
+      }
     </strong>
-    <span><nz-icon nzType="check-circle" nzTheme="fill" /> Бюджет не превышен</span>
-    <span><nz-icon nzType="check-circle" nzTheme="fill" /> Повторов нет</span>
-    <span><nz-icon nzType="info-circle" nzTheme="fill" /> Направлений: {{ store.coverageCount() }}/5</span>
+    <span>Бюджет: {{ store.spentBudget() }} / {{ store.totalBudget() }}</span>
+    <span>Направлений: {{ store.coverageCount() }} / {{ store.directionMeta.length }}</span>
+  </div>
+  @if (store.validationErrors().length) {
+    <ul class="validation-errors" role="alert">
+      @for (error of store.validationErrors(); track $index) {
+        <li>{{ error }}</li>
+      }
+    </ul>
+    <div class="validation-retry">
+      <button nz-button nzSize="small" type="button" [nzLoading]="store.isValidating()" [disabled]="store.isValidating()" (click)="store.validateScenario()">Повторить проверку</button>
+    </div>
+  }
+  <div class="scenario-actions">
+    <label for="scenario-name">Название сценария</label>
+    <input nz-input id="scenario-name" placeholder="Введите название сценария" maxlength="100" required [ngModel]="store.scenarioName()" (ngModelChange)="store.setScenarioName($event)" [disabled]="store.isSaving()" />
+    @if (!store.scenarioName().trim()) {
+      <small class="name-error">Введите название, чтобы сохранить сценарий.</small>
+    }
+    <div class="action-buttons">
+      <button nz-button nzType="primary" type="button" aria-label="Рассчитать сценарий" [nzLoading]="store.isCalculating()" [disabled]="!store.canCalculate()" (click)="store.calculateScenario()">
+        <nz-icon nzType="play-circle" aria-hidden="true" /> Рассчитать сценарий
+      </button>
+      <button nz-button type="button" [attr.aria-label]="store.isSaved() ? 'Сохранено' : 'Сохранить сценарий'" [nzLoading]="store.isSaving()" [disabled]="!store.canSave() || store.isSaved()" (click)="store.saveScenario()">
+        <nz-icon [nzType]="store.isSaved() ? 'check' : 'save'" aria-hidden="true" /> {{ store.isSaved() ? 'Сохранено' : 'Сохранить сценарий' }}
+      </button>
+    </div>
   </div>
 </section>
-

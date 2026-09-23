@@ -6,6 +6,9 @@
     <span>
       <strong>Аким на 5 часов</strong>
       <small>AI-симулятор управления городом</small>
+      <small class="api-status" [class.connected]="store.health()?.status === 'ok'" role="status">
+        {{ store.health()?.status === 'ok' ? 'Сервер подключён' : store.isLoading() ? 'Подключение к серверу…' : 'Сервер недоступен' }}
+      </small>
     </span>
   </a>
 
@@ -18,11 +21,11 @@
 
   <section
     class="header-budget"
-    [attr.aria-label]="'Бюджет: использовано ' + store.spentBudget() + ' из ' + store.totalBudget"
+    [attr.aria-label]="'Бюджет: использовано ' + store.spentBudget() + ' из ' + store.totalBudget()"
   >
     <div class="budget-copy">
       <span>Бюджет</span>
-      <strong>{{ store.spentBudget() }} / {{ store.totalBudget }}</strong>
+      <strong>{{ store.spentBudget() }} / {{ store.totalBudget() }}</strong>
       <small>Осталось {{ store.remainingBudget() }}</small>
     </div>
     <nz-progress
@@ -38,11 +41,11 @@
   </time>
 
   <div class="header-actions">
-    <button nz-button nzType="default" type="button" (click)="store.saveScenario()">
+    <button nz-button nzType="default" type="button" aria-label="Сохранить сценарий" [nzLoading]="store.isSaving()" [disabled]="!store.canSave() || store.isSaved()" (click)="store.saveScenario()">
       <nz-icon [nzType]="store.isSaved() ? 'check' : 'save'" />
       {{ store.isSaved() ? 'Сохранено' : 'Сохранить' }}
     </button>
-    <button nz-button nzType="primary" type="button" (click)="store.restoreDemo()">
+    <button nz-button nzType="primary" type="button" aria-label="Восстановить демонстрационный сценарий" [disabled]="!store.hasDataset() || store.isSaving() || store.isCalculating() || store.isAnalyzing()" (click)="store.restoreDemo()">
       <nz-icon nzType="play-circle" />
       Презентация
     </button>
